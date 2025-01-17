@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+        <title>Operator Lists</title>
+    </head>
+    <body>
+        
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Bitla Software</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="createoperator.html">Create New Operator</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="downloadScript.html">Download Script File</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            <h4 class="text-center"><u>Follow the below procedure for Saving Script File</u></h4>
+            <form id="fileForm">
+                <div class="form-group otherdiv">
+                    <label for="projectPath">Project Path (For Storing APK file)</label>
+                    <input type="text" class="form-control" id="projectPath" value="/Users/souvikchaudhury/Documents/OfficeProjects"
+                        placeholder="/Users/souvikchaudhury/Documents/OfficeProjects" required>
+                </div>
+                <div class="form-group otherdiv">
+                    <label for="androidFolderPath">Android Project Folder Path</label>
+                    <input type="text" class="form-control" id="androidFolderPath" value="/Users/souvikchaudhury/Documents/OfficeProjects/android/ts-operator-native"
+                        placeholder="/path/to/android/folder" required>
+                </div>
+                <div class="form-group otherdiv">
+                    <label for="system">Select System</label>
+                    <select class="form-control" id="system" required>
+                        <option value="mac">Mac (Download .command)</option>
+                        <option value="linux">Linux (Download .sh)</option>
+                    </select>
+                </div>
+                <h4 class=""><u>Follow the below procedure for Token</u></h4>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p>Mac User Run below script and add token on the keychain</p>
+                        <p><code>security add-generic-password -a your_account -s github_token -w "your_actual_token_here"</code></p>
+                        <p><small><b>Note:</b> Run above command on terminal</small></p>
+                    </div>
+                    <div class="col-sm-12">
+                        <p>Linux User Run below script and add token on the keychain</p>
+                        <p><code>secret-tool store --label="GitHub Token" account your_account service github_token</code></p>
+                        <p><small><b>Note:</b> Run above command on terminal</small></p>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4><u>Follow the below procedure for save the script file</u></h4>
+                        <p>Copy the below script and create a new file and save this with the name of <b>appscript.command</b> if it is mac</p>
+                        <p>Save this with the name of <b>appscript.sh</b> if it is Linux</p>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4><u>Follow the below procedure for making the script file executable</u></h4>
+                        <p><code>sudo chmod -R 755 {Navigate to script file}</code></p>
+                        <p><small><b>Note:</b> Run above command on terminal</small></p>
+                    </div>
+                </div>
+                <div class="form-group scriptdiv" style="display: none;">
+                    <label for="scriptfile">Script</label>
+                    <textarea class="form-control" id="scriptfile" style="height: 400px;" readonly="true">#!/bin/bash
+                        # *********************************************************************************************************
+                        # Required Software Installation 
+                            # sed command is not working in mac https://medium.com/@bramblexu/install-gnu-sed-on-mac-os-and-set-it-as-default-7c17ef1b8f64
+                            # which sed              
+                            # /usr/bin/sed
+                            # brew install gnu-sed
+                            # brew info gnu-sed
+                            # GNU "sed" has been installed as "gsed". If you need to use it as "sed", you can add a "gnubin" directory to your PATH from your bashrc like: PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+                            # After installing gsed run this command  =>   source ~/.zshrc
+                            # --------------------------------------------------------------------------
+                            # brew install imagemagick  #--------------- Imagemagick need to install for convert the image
+                            # --------------------------------------------------------------------------
+                            # Gradle installation
+                            # --------------------------------------------------------------------------
+                            # curl -s "https://get.sdkman.io" | bash  (SDK Man install for gradle)
+                            # sdk list gradle
+                            # sdk install gradle 8.10
+                            # sdk use gradle 8.10
+                            # --------------------------------------------------------------------------
+                            # JDK 17 installation
+                            # --------------------------------------------------------------------------
+                            # brew install openjdk@17
+                            # brew install --cask android-platform-tools
+                            # echo 'export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"' >> ~/.zshrc
+                            # sudo ln -sfn /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
+                            # CPPFLAGS="-I/opt/homebrew/opt/openjdk@17/include"
+                        # *********************************************************************************************************
+                            
+                        # *********************************************************************************************************
+                        # Initial path setup from own computer
+
+                            ProjectPath=""
+                            androidFolderPath=""  # This is android repository path.
+                            echo $androidFolderPath
+                            # exit
+                        # *********************************************************************************************************
+
+                        # *********************************************************************************************************
+                        # Variable Declaration
+
+                            buildRequired=1
+
+                            echo "Enter Build required no:"
+                            read buildRequired
+
+                            today=$(date +"%d-%m-%Y-%H-%M")  # Today d-m-y-h-m used for folder creation.
+
+                            # All Path Declaration. !Don't change this path.
+                            APKFolder="$ProjectPath/APKFile"
+                            # apkFileFolderPath="$APKFolder/$today"
+                            apkFileFolderPath="$APKFolder/$buildRequired"
+                            operatorDetailsFolderPath="$apkFileFolderPath/operator-details"  # This is opeartor details library path.
+                            # androidProjectPath="$apkFileFolderPath/ts-operator-native"
+
+                            androidProjectPath=$androidFolderPath
+
+                            androidResFolderPath="$androidProjectPath/app/src/main/res"
+                            androidReleaseFolderPath="$androidProjectPath/app/build/outputs/apk/release"
+                            androidReleaseBundleFolderPath="$androidProjectPath/app/build/outputs/bundle/release"
+
+                            iconFileName="ic_launcher.png"
+                            splashFileName="splash.png" 
+                            MYARRAY=()
+                        
+                            
+                            # ----------------------------------------------------------------------------------------------------------
+                            # Github Realted Settings
+                                OWNER="bitla-soft"  # GitHub username
+                                REPO="operator-details"  # Repository name
+                                BRANCH="master"  # Branch name            
+                                TOKEN=""
+                            # ----------------------------------------------------------------------------------------------------------
+
+                        # *********************************************************************************************************
+
+                        # *********************************************************************************************************
+                        # APK File storage directory creation
+                            mkdir -p "$APKFolder"
+                            mkdir -p "$apkFileFolderPath"
+                        # *********************************************************************************************************
+
+                        # *********************************************************************************************************
+                        # Log File To store full process Log
+                            LOG_FILE_NAME="$apkFileFolderPath/script_log.txt"
+                            touch $LOG_FILE_NAME # Create File
+                            exec > >(tee -a "$LOG_FILE_NAME") 2>&1 # Excecuting and storing file
+                        # *********************************************************************************************************
+
+                        # *********************************************************************************************************
+                        # Customer App Project Copy 
+                            # echo "FOlderss =======> "
+                            # echo $apkFileFolderPath
+                            # echo $androidFolderPath
+
+                            # cp -R $androidFolderPath $apkFileFolderPath
+
+                            # if [ -d "$androidProjectPath" ]; then
+                            #     # Grant write permissions to the directory
+                            #     chmod -R u+w "$androidProjectPath"
+                            #     echo "Write permissions granted to $androidProjectPath."
+                            # else
+                            #     echo "Directory $androidProjectPath does not exist."
+                            # fi
+
+                        # *********************************************************************************************************  
+
+                        # *********************************************************************************************************
+                        # Call the curl command and save the output
+                            
+                            curlUrl="https://script.google.com/macros/s/AKfycbznneUz0Qfj6-pJ6YJ0NtmrslwOGFhOtsGCusqVXBIcS--TUQvHPdo6QzOdFwgQz5sk/exec?is_json=false&empid=BS1614&user_agent=script&build_required=$buildRequired"
+
+                            # Send the request and capture the output
+                            echo "Requesting URL: $curlUrl"
+                            response=$(curl --location "$curlUrl")
+
+                            # Check if the response is not empty
+                            if [[ -z "$response" ]]; then
+                                echo "Curl response is empty. Exiting..."
+                                exit 1
+                            fi
+
+                            # Split the response into an array by newlines (each line will be an array element)
+                            IFS=$'\n' read -r -d '' -a dataArray <<< "$response"
+
+                            # Verify the array length
+                            echo "Length of dataArray: ${#dataArray[@]}"
+                        # *********************************************************************************************************
+                        
+                        # *********************************************************************************************************
+                        # Main Process of Splash Icons, Building Gradle and Generate APK and BUNDLE
+
+                            for line in "${dataArray[@]}"
+                            do
+                                IFS=',' read -r isGenerate verNum verCode subdomain keystore aliasname keystorepass applicationId applicationName baseUrl selectCountry <<< "$line" #reading str as an array as tokens separated by IFS
+                                
+                                    echo $line
+
+                                    APKGENERATEDSTATUS=0 # 0 => Not generated  1=> Generated
+
+                                    if [ "$selectCountry" == "A" ] || [ "$selectCountry" == "a" ]; then
+                                        GITHUB_FOLDER_PATH="africa/$subdomain" 
+                                        operatorDetailsPath="$operatorDetailsFolderPath/africa/$subdomain"
+
+                                        isafr="const val IS_AFRICA = 1"
+                                        gsed -i "/\ const val IS_AFRICA/c \ \ \ \ \ \ \ \ ${isafr}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                        indn="const val IS_INDONESIA = 0"
+                                        gsed -i "/\ const val IS_INDONESIA/c \ \ \ \ \ \ \ \ ${indn}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                        
+                                    elif [ "$selectCountry" == "I" ] || [ "$selectCountry" == "i" ]; then
+                                        GITHUB_FOLDER_PATH="indonesia/$subdomain" 
+                                        operatorDetailsPath="$operatorDetailsFolderPath/indonesia/$subdomain"
+
+                                        isafr="const val IS_AFRICA = 0"
+                                        gsed -i "/\ const val IS_AFRICA/c \ \ \ \ \ \ \ \ ${isafr}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                        indn="const val IS_INDONESIA = 1"
+                                        gsed -i "/\ const val IS_INDONESIA/c \ \ \ \ \ \ \ \ ${indn}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+
+                                    elif [ "$selectCountry" == "N" ] || [ "$selectCountry" == "n" ]; then
+                                        GITHUB_FOLDER_PATH="national/$subdomain" 
+                                        operatorDetailsPath="$operatorDetailsFolderPath/national/$subdomain"
+                                        
+                                        isafr="const val IS_AFRICA = 0"
+                                        gsed -i "/\ const val IS_AFRICA/c \ \ \ \ \ \ \ \ ${isafr}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                        indn="const val IS_INDONESIA = 0"
+                                        gsed -i "/\ const val IS_INDONESIA/c \ \ \ \ \ \ \ \ ${indn}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                    fi
+                                    
+
+                                    echo -e "\n===========================================\nOperator Details\n"
+                                    echo -e "Version : ${verNum}\nVersion Code : ${verCode}\nOperator Folder Name and Apk File Name (Subdomain): ${subdomain}"
+                                    echo -e "Operator Folder Path: ${operatorDetailsPath}\nKeystore Name : ${keystore}\nAlias Name : ${aliasname}"
+                                    echo -e "Keystore Password : ${keystorepass}\nApplication ID : ${applicationId}\nApplication name : ${applicationName}"
+                                    echo -e "Base URL : ${baseUrl}\nKEY PATH : $operatorDetailsPath/$keystore\n==========================================="
+
+                        
+                                    # ----------------------------------------------------------------------------------------------------------
+                                    # Creating subdomain folder in Today's folder
+
+                                        mkdir -p "$operatorDetailsPath"
+                                        subdomainFolder="$apkFileFolderPath/$subdomain"
+                                        rm -rf $subdomainFolder
+                                        mkdir -p "$subdomainFolder"
+                                    # ----------------------------------------------------------------------------------------------------------
+                                    
+                                    # ----------------------------------------------------------------------------------------------------------
+                                    # Operator Details Fetch direct from GitHub
+                                    
+                                        # GitHub API URL for listing folder contents
+                                        API_URL="https://api.github.com/repos/$OWNER/$REPO/contents/$GITHUB_FOLDER_PATH?ref=$BRANCH"
+
+                                        # Fetch the list of files in the folder
+                                        file_list=$(curl -s -H "Authorization: token $TOKEN" "$API_URL" | grep '"download_url"' | awk -F '"' '{print $4}')
+
+                                        # Download each file in the folder
+                                        for file_url in $file_list; do
+                                            # Encode spaces in the URL for downloading
+                                            encoded_file_url=$(echo "$file_url" | sed 's/ /%20/g')
+                                            encoded_file_name=$(basename "${encoded_file_url%%\?*}")
+                                            
+                                            # Decode %20 back to space for the original file name
+                                            original_file_name=$(echo "$encoded_file_name" | sed 's/%20/ /g')
+                                            
+                                            echo "Downloading $original_file_name..."
+                                            curl -L -H "Authorization: token $TOKEN" "$encoded_file_url" -o "$operatorDetailsPath/$encoded_file_name"
+                                            
+                                            # Rename the file to restore spaces
+                                            mv "$operatorDetailsPath/$encoded_file_name" "$operatorDetailsPath/$original_file_name"
+                                            echo "Renamed $encoded_file_name to $original_file_name."
+                                        done
+                                    # exit
+                                    # ----------------------------------------------------------------------------------------------------------
+
+                                    if test -d $operatorDetailsPath; then
+                                        
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Replace files
+
+                                            # Replace Application id in the gradle file
+                                            gappl="applicationId \"${applicationId}\""
+                                            gsed -i "/applicationId /c \ \ \ \ \ \ \ \ ${gappl}" $androidProjectPath/app/build.gradle
+
+                                            # Replace Version code in the gradle file
+                                            vcappl="versionCode ${verCode}"
+                                            gsed -i "/versionCode /c \ \ \ \ \ \ \ \ ${vcappl}" $androidProjectPath/app/build.gradle
+
+                                            # Replace Version number in the gradle file
+                                            vnppl="versionName \"${verNum}\""
+                                            gsed -i "/versionName /c \ \ \ \ \ \ \ \ ${vnppl}" $androidProjectPath/app/build.gradle
+
+                                            # Replace Operator name in string.xml
+                                            vsnppl="<string name=\"app_name\">${applicationName}</string>"
+                                            gsed -i "/app_name/c \ \ \ \ ${vsnppl}" $androidProjectPath/app/src/main/res/values/strings.xml
+
+                                            # Replace Operator name in indonesia string.xml
+                                            gsed -i "/app_name/c \ \ \ \ ${vsnppl}" $androidProjectPath/app/src/main/res/values-in/strings.xml
+
+                                            #Replace Baseurl in APIClient.xml
+                                            baseu="const val BASE_URL: String = \"${baseUrl}\""
+                                            gsed -i "/const val BASE_URL/c \ \ \ \ \ \ \ \ ${baseu}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                            
+                                            #copy jks file in project/app folder 
+                                            cp -R "$operatorDetailsPath/$keystore" $androidProjectPath/app/
+
+                                            #Replace keystorePath id in the gradle file
+                                            keystorePath="storeFile file('$keystore')"
+                                            gsed -i "/storeFile /c \ \ \ \ \ \ \ \ ${keystorePath}" $androidProjectPath/app/build.gradle
+
+                                            #Replace Alias in the gradle file
+                                            keyAlias="keyAlias '$aliasname'"
+                                            gsed -i "/keyAlias /c \ \ \ \ \ \ \ \ ${keyAlias}" $androidProjectPath/app/build.gradle
+
+                                            #Replace Application id in the google json file
+                                            cp -R $operatorDetailsPath/google-services.json $androidProjectPath/app/google-services.json
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Operator specific changes (Chartered Bus, Chaturbedi Travels)
+                                            if [ "$subdomain" == "cbus" ]; then
+                                                baseus="const val IS_SPLASH_SHOW_WITH_LOGO = 1"
+                                                gsed -i "/const val IS_SPLASH_SHOW_WITH_LOGO/c \ \ \ \ \ \ \ \ ${baseus}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                            else
+                                                baseua="const val IS_SPLASH_SHOW_WITH_LOGO = 0"
+                                                gsed -i "/\ const val IS_SPLASH_SHOW_WITH_LOGO/c \ \ \ \ \ \ \ \ ${baseua}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                            fi
+
+                                            if [ "$subdomain" == "cbsl" ]; then
+                                                baseus="const val IS_VIDEO_SPLASH = 1"
+                                                gsed -i "/const val IS_VIDEO_SPLASH/c \ \ \ \ \ \ \ \ ${baseus}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                                mv $androidProjectPath/app/src/main/res/raw/splash_video.mp4 $androidProjectPath/app/src/main/res/raw/splash_video_bkp.mp4
+                                                cp -R $operatorDetailsPath/splash_video.mp4 $androidProjectPath/app/src/main/res/raw/splash_video.mp4
+                                            else
+                                                baseua="const val IS_VIDEO_SPLASH = 0"
+                                                gsed -i "/\ const val IS_VIDEO_SPLASH/c \ \ \ \ \ \ \ \ ${baseua}" $androidProjectPath/app/src/main/java/com/bitla/mba/tsoperator/api/APIClient.kt
+                                            fi
+                                        # ----------------------------------------------------------------------------------------------------------
+                                
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Icon and splash screen generation and Copy to Project Folder
+
+                                            iconFileUrl="$operatorDetailsPath/$iconFileName"
+                                            splashFileUrl="$operatorDetailsPath/$splashFileName"
+                                            
+
+                                            mkdir -p $operatorDetailsPath/android/mipmap-xxxhdpi
+                                            mkdir -p $operatorDetailsPath/android/mipmap-xxhdpi
+                                            mkdir -p $operatorDetailsPath/android/mipmap-xhdpi
+                                            mkdir -p $operatorDetailsPath/android/mipmap-hdpi
+                                            mkdir -p $operatorDetailsPath/android/mipmap-mdpi
+
+                                            magick $iconFileUrl -resize 512x512 $operatorDetailsPath/playstore.png
+                                            magick $iconFileUrl -resize 192x192 $operatorDetailsPath/android/mipmap-xxxhdpi/$iconFileName
+                                            magick $iconFileUrl -resize 144x144 $operatorDetailsPath/android/mipmap-xxhdpi/$iconFileName
+                                            magick $iconFileUrl -resize 96x96 $operatorDetailsPath/android/mipmap-xhdpi/$iconFileName
+                                            magick $iconFileUrl -resize 72x72 $operatorDetailsPath/android/mipmap-hdpi/$iconFileName
+                                            magick $iconFileUrl -resize 48x48 $operatorDetailsPath/android/mipmap-mdpi/$iconFileName
+
+                                            magick $splashFileUrl -resize 75% $operatorDetailsPath/android/mipmap-xxhdpi/$splashFileName
+                                            magick $splashFileUrl -resize 50% $operatorDetailsPath/android/mipmap-xhdpi/$splashFileName
+                                            magick $splashFileUrl -resize 38% $operatorDetailsPath/android/mipmap-hdpi/$splashFileName
+                                            magick $splashFileUrl -resize 25% $operatorDetailsPath/android/mipmap-mdpi/$splashFileName
+                                        
+                                            cp $splashFileUrl $operatorDetailsPath/android/mipmap-xxxhdpi/$splashFileName
+                                            echo "Icon and splash generated"
+
+                                            cp -R $operatorDetailsPath/android/* $androidResFolderPath # Copy icon and splash from operators android folder to android res folder
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Navigate to android directory for Build Generation
+                                            echo "====== Change Directory ====="
+                                            cd $androidProjectPath
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Gradle Build
+
+                                            echo "====== Gradle Build Commands ====="
+                                            #Clean build folder and build cache
+                                            echo "====== Gradle clean ====="
+                                            ./gradlew clean
+                                            echo "====== Gradle App clean ====="
+                                            ./gradlew :app:clean
+                                            echo "====== Gradle Sync ====="
+                                            ./gradlew build
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Release APK and Bundle Generation
+                                            echo "====== APK File Release ====="
+                                            ./gradlew :app:bundleRelease
+                                            ./gradlew :app:assembleRelease
+                                            APKGENERATEDSTATUS=1
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # .JKS / Keystore Generation
+                                            # echo $operatorDetailsPath/$keystore
+                                            # jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $operatorDetailsPath/$keystore $androidReleaseFolderPath/app-release-unsigned.apk $aliasname <<< $keystorepass
+                                            # zipalign -v 4 $androidReleaseFolderPath/app-release-unsigned.apk $subdomain.apk
+                                            # zipalign -v 4 $androidReleaseFolderPath/app-release.apk $subdomain.apk
+                                            # cd $subdomain
+                                            # keytool -storepass android123 -keypass android123 -genkey -alias $aliasname -keyalg RSA -keysize 2048 -keystore $keystore -dname "CN=Bitla Software, OU=Bitla, O=Bitla Software, L=Bangalore, ST=Karnataka, C=IN"
+                                            # keytool -importkeystore -srckeystore $keystore -destkeystore $keystore -deststoretype pkcs12
+                                            # cd $operatorDetailsPath
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Move APK and Bundle to Subdomain Folder
+                                            mv $androidReleaseFolderPath/app-release.apk $subdomainFolder/$subdomain.apk
+                                            mv $androidReleaseBundleFolderPath/app-release.aab $subdomainFolder/$subdomain.aab
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Clear .jks / Keystore file and Operator Details from project/app and Todays folder 
+                                        
+                                            rm -rf $androidProjectPath/app/$keystore
+                                            rm -rf $operatorDetailsFolderPath
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Operator specific Splash Video change to low quality
+                                            if [ "$subdomain" == "cbsl" ]; then
+                                                mv $androidProjectPath/app/src/main/res/raw/splash_video_bkp.mp4 $androidProjectPath/app/src/main/res/raw/splash_video.mp4
+                                            fi
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                        # ----------------------------------------------------------------------------------------------------------
+                                        # Update Subdomain and build number
+                                            endCurlUrl="https://script.google.com/macros/s/AKfycbznneUz0Qfj6-pJ6YJ0NtmrslwOGFhOtsGCusqVXBIcS--TUQvHPdo6QzOdFwgQz5sk/exec?is_json=true&is_post=true&empid=BS1614&user_agent=script&build_required=$buildRequired&subdomain=$subdomain"
+                                            # Send the request and capture the output
+                                            echo "Requesting URL: $endCurlUrl"
+                                            response=$(curl --location "$endCurlUrl")
+                                        # ----------------------------------------------------------------------------------------------------------
+
+                                    else
+                                        echo -e "Operator subdomain not exists in directory.\n===========================================\n"
+                                    fi
+
+                                # fi
+                            done
+                            
+                            # rm -rf $androidProjectPath
+                        # *********************************************************************************************************
+                    </textarea>
+                </div>
+        
+                <button type="submit" class="btn btn-primary mt-5 mb-5 btn-block otherdiv">Generate Script File</button>
+            </form>
+
+
+            <div id="loader" class="text-center d-none" style="margin-top: 20%;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+        
+        <script>
+            $(document).ready(function () {
+                storedEmpId = sessionStorage.getItem("empid");
+                sessionemptoken = sessionStorage.getItem("emptoken");
+                var oldSubdomain = "";
+
+                if (!storedEmpId || !sessionemptoken) {
+                    window.location.href = "index.html";
+                }
+                
+                $("#logout").click(function(){
+                    sessionStorage.clear();
+                    window.location.href = "index.html";
+                });
+
+
+                $('#fileForm').submit(function (e) {
+                    e.preventDefault();
+
+                    const projectPath = $('#projectPath').val();
+                    const androidFolderPath = $('#androidFolderPath').val();
+                    const system = $('#system').val();
+                    let fileContent = $('#scriptfile').val();  // Changed from const to let
+                    
+                    const fileName = system === "mac" ? "appscript.command" : "appscript.sh";
+
+
+                    // Replace lines in the file
+                    fileContent = fileContent.replace(/ProjectPath=".*?"/, `ProjectPath="${projectPath}"`);
+                    fileContent = fileContent.replace(/androidFolderPath=".*?"/, `androidFolderPath="${androidFolderPath}"`);
+                    if(system === "linux")
+                        fileContent = fileContent.replace(/TOKEN=".*?"/, `TOKEN="$(secret-tool lookup account your_account service github_token)"`);
+                    else
+                        fileContent = fileContent.replace(/TOKEN=".*?"/, `TOKEN="$(security find-generic-password -a your_account -s github_token -w)"`);
+                    
+                    $('#scriptfile').val(fileContent);
+                    $('.scriptdiv').show();
+                    $(".otherdiv").hide();
+                   
+                });
+            });
+        </script>
+    </body>
+</html>

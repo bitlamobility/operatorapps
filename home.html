@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+        <title>Operator Lists</title>
+        <style>
+            body {
+                padding-top: 55px;  /* Adjust this value depending on the height of your navbar */
+            }
+            #loader{
+                display: block;
+                position: fixed;
+                background: #00000054;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                padding-top: 15%;
+            }
+            .table-wrapper {
+                overflow-x: auto;
+                max-width: 100%;
+            }
+            .table-wrapper table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .table-responsive {
+                margin-bottom: 15px;
+            }
+            .count-section {
+                margin-top: 20px;
+                margin-bottom: 30px;
+            }
+            .count-item {
+                margin-bottom: 10px;
+            }
+            .dt-length label{
+                margin-left: 10px;
+            }
+            .count-section, .table-wrapper, #submitButton, .chart-container, .countdata {
+                display: none;
+            }
+            .jumbotron {
+                padding: 1rem 2rem;  /* Adjust padding for compactness */
+                margin-bottom: 1rem;  /* Reduce margin bottom */
+            }
+
+            .jumbotron h3 {
+                font-size: 1.5rem; /* Reduce font size */
+            }
+
+            .jumbotron p {
+                font-size: 1rem;  /* Reduce font size */
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div id="loader" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" >
+            <a class="navbar-brand" href="#">Bitla Software</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active" id="menu_home">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item" id="menu_dashboard">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item" id="menu_create_new_operator">
+                        <a class="nav-link" href="createoperator.html">Create New Operator</a>
+                    </li>
+                    <li class="nav-item" id="menu_download_script">
+                        <a class="nav-link" href="downloadScript.html">Download Script File</a>
+                    </li>
+                    <li class="nav-item" id="menu_logout">
+                        <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="jumbotron text-center mb-3 py-3">
+                <h3 class="mb-2">Bitla Software</h3>
+                <p class="mb-0">Operator Android App lists in Bitla</p>
+            </div>
+            
+            <!-- <div class="countdata">
+                <div class="row">
+                    <! -- Total Count Card -- >
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong>Total Count</strong>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title"><span id="totalCount">0</span></h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <! -- Build Required Counts Card -- >
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong>Build Required Counts</strong>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Build Number</th>
+                                            <th>Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="buildRequiredCounts">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <! -- Country Wise Counts Card -- >
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong>Country Wise Counts</strong>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Country</th>
+                                            <th>Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="countryWiseCounts">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+            <div class="table-wrapper">
+                <table class="table table-bordered" id="example">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Build Required</th>
+                            <th>Version</th>
+                            <th>Version Code</th>
+                            <th>Sub Domain</th>
+                            <th>Key File Name</th>
+                            <th>Alias Name</th>
+                            <th>Password</th>
+                            <th>Android Package Name</th>
+                            <th>Operator Name</th>
+                            <th>Base URL</th>
+                            <th>Country Name</th>
+                            <th>Developer Name</th>
+                            <th>Last App Published Date</th>
+                            <th>Play Store Link</th>
+                            <th>Region</th>
+                            <th>Analytics Email</th>
+                            <th>Analytics Property</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <button id="submitButton" class="btn btn-primary mt-5 mb-5 btn-block">Submit</button>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="responseModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Build Number</h5>
+                        <button type="button" class="close" id="responseModalClose">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h5 id="responseMessage"></h5>
+                        <p>Note: Kindly use the above build number for build generation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // const API_URL = "https://script.google.com/macros/s/AKfycbyN92CNP9xwCIBkFSonIuYQpGQMRATgpWtax3U1Qs2vWUiR7rPAagPNgpvCebsn2_gZ/exec"; // my email
+                const API_URL = "https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec"; // official email
+
+                storedEmpId = sessionStorage.getItem("empid");
+                sessionemptoken = sessionStorage.getItem("emptoken");
+                sessionemprole = sessionStorage.getItem("emprole");
+
+                // alert(storedEmpId);
+                // alert(sessionemptoken);
+
+                if(sessionemprole=="appdeveloper"){
+                    $("#menu_dashboard").hide();
+                    $("#menu_download_script").hide();
+                } else if(sessionemprole=="support"){
+                    $("#menu_download_script").hide();
+                    $("#menu_create_new_operator").hide();
+                    $('#submitButton').hide();
+                }
+
+                
+                if (!storedEmpId || !sessionemptoken) {
+                    window.location.href = "index.html";
+                }else{
+                    loadDataTable(storedEmpId,sessionemptoken,sessionemprole);
+                }
+
+                $("#logout").click(function(){
+                    sessionStorage.clear();
+                    window.location.href = "index.html";
+                });
+                
+
+                function loadDataTable(empid, sessionemptoken,sessionemprole) {
+                    $('#loader').removeClass("d-none");
+
+                    if(sessionemprole=="support"){
+                        $('#submitButton').hide();
+                    }else{
+                        $('#submitButton').show();
+                    }
+                    
+                    $('.count-section, .countdata').show();
+                    let selectedSubdomains = new Set();
+
+                    const table = $('#example').DataTable({
+                        ajax: {
+                            url: `${API_URL}?authtoken=${sessionemptoken}&fetch_entry=true&empid=${empid}`,
+                            //dataSrc: 'app_lists',
+                            dataSrc: function (response) {
+                                // Check the response code
+                                if (response.code === 200) {
+                                    // If the code is 200, return the data to be used by DataTable
+                                    return response.app_lists;
+                                } else {
+                                    // If the code is not 200 (invalid access token), redirect to login page
+                                    sessionStorage.clear();
+                                    window.location.href = "index.html";  // Change this URL as per your app's login route
+                                    return []; // Return an empty array to prevent DataTable from rendering
+                                }
+                            }
+                        },
+                        columns: [
+                            {
+                                data: 'sub_domain',
+                                render: function (data) {
+                                    return `<input type="checkbox" class="rowCheckbox" data-subdomain="${data}">`;
+                                }
+                            },
+                            { data: 'build_required' },
+                            { data: 'version' },
+                            { data: 'version_code' },
+                            { data: 'sub_domain' },
+                            { data: 'key_file_name' },
+                            { data: 'alias_name' },
+                            { data: 'password' },
+                            { data: 'android_package_name' },
+                            { data: 'operator_name' },
+                            { data: 'base_url' },
+                            { data: 'country_name' },
+                            { data: 'developer_name' },
+                            {
+                                data: 'last_app_published_date',
+                                render: function (data) {
+                                    return data ? new Date(data).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : "N/A";
+                                }
+                            },
+                            {
+                                data: 'playstore_link',
+                                render: function (data) {
+                                    // Check if the playstore_link exists and is a valid URL
+                                    return data ? `<a href="${data}" target="_blank">${data}</a>` : 'N/A';
+                                }
+                            },
+                            { data: 'region' },
+                            { data: 'analytics_email' },
+                            { data: 'analytics_property' },
+                            {
+                                data: 'sub_domain',
+                                render: function (data, type, row) {
+                                    // Check if the render type is 'display' for DataTables
+                                    if (type === 'display' && sessionemprole!="support") {
+                                        const base64Encoded = btoa(storedEmpId+":"+data.trim()+":"+sessionemptoken);
+                                        return `<input type="button" class="btn btn-primary editBtn" value="Edit" data-subdomain="${base64Encoded}">`;
+                                    }else{
+                                        return `<input type="button" class="btn btn-secondary" disabled value="Edit">`;
+                                    }
+                                    return data; // Return raw data for export or other processing
+                                }
+                            }
+                        ],
+                        processing: true,
+                        responsive: true,
+                        scrollX: true,
+                        fixedHeader: true,
+                        pageLength: 100,
+                        lengthMenu: [5, 10, 25, 50, 100],
+                        initComplete: function () {
+                            
+                            if (sessionemprole === 'support') {
+                                table.column(0).visible(false);  // Column index starts at 0
+                                table.column(1).visible(false);  // Column index starts at 0
+                                table.column(5).visible(false);  // Column index starts at 0
+                                table.column(6).visible(false);  // Column index starts at 0
+                                table.column(7).visible(false);  // Column index starts at 0
+                                table.column(8).visible(false);  // Column index starts at 0
+                                table.column(16).visible(false);  // Column index starts at 0
+                                table.column(17).visible(false);  // Column index starts at 0
+                                table.column(18).visible(false);  // Column index starts at 0
+                            }
+                        }
+                    });
+
+                    // Handle checkbox selection
+                    $('#example tbody').on('change', '.rowCheckbox', function () {
+                        const subdomain = $(this).data('subdomain');
+                        if (this.checked) {
+                            selectedSubdomains.add(subdomain);
+                        } else {
+                            selectedSubdomains.delete(subdomain);
+                        }
+                    });
+
+                    // Handle form submission
+                    $('#submitButton').on('click', function () {
+                        $('#loader').removeClass("d-none");
+
+                        if (selectedSubdomains.size === 0) {
+                            alert("Please select at least one subdomain.");
+                            return;
+                        }
+
+                        $.ajax({
+                            
+                            url: `${API_URL}?authtoken=${sessionemptoken}&subdomains=${Array.from(selectedSubdomains).join(',')}&empid=${empid}`,  // Update this to your API endpoint
+                            type: 'GET',
+                            success: function (response) {
+                                $('#responseMessage').text(response.build_required);
+                                $('#responseModal').modal('show');
+                                $('#loader').addClass("d-none");
+                            },
+                            error: function (xhr, status, error) {
+                                $('#responseMessage').text(`Error: ${error}`);
+                                $('#responseModal').modal('show');
+                                $('#loader').addClass("d-none");
+                            }
+                        });
+                    });
+
+                    $('#responseModalClose').on('click', function() {
+                        // Close the modal
+                        $('#responseModal').modal('hide');
+                        window.location.reload();
+                        
+                    });
+
+                    $('#example').on('click', '.editBtn', function () {
+                        const encodedSubdomain = $(this).attr("data-subdomain");
+                        window.location.href = `updateoperator.html?subdomain=${encodedSubdomain}`;
+                        // alert(encodedSubdomain);
+                    });
+
+                    // Maintain checkbox states when changing pages
+                    table.on('draw', function () {
+                        $(".table-wrapper").show();
+                        $('#example tbody .rowCheckbox').each(function () {
+                            const subdomain = $(this).data('subdomain');
+                            $(this).prop('checked', selectedSubdomains.has(subdomain));
+                        });
+                    });
+                    
+                    // Calculate chart data based on table data
+                    table.on('xhr', function () {
+                        $('#loader').addClass("d-none");
+                    });
+                }
+            });
+
+        </script>
+    </body>
+</html>

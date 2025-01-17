@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+        <title>Operator Lists</title>
+        <style>
+            body {
+                padding-top: 55px;  /* Adjust this value depending on the height of your navbar */
+            }
+            #loader{
+                display: block;
+                position: fixed;
+                background: #00000054;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                padding-top: 15%;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div id="loader" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" >
+            <a class="navbar-brand" href="#">Bitla Software</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" id="menu_home">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item" id="menu_dashboard">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item active" id="menu_create_new_operator">
+                        <a class="nav-link" href="createoperator.html">Create New Operator</a>
+                    </li>
+                    <li class="nav-item" id="menu_download_script">
+                        <a class="nav-link" href="downloadScript.html">Download Script File</a>
+                    </li>
+                    <li class="nav-item" id="menu_logout">
+                        <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="jumbotron text-center mb-3 py-3">
+                <h2>Create a New entry of Operator</h2>
+            </div>
+            
+            <form id="CreateForm">
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="operatorName">Operator Name</label>
+                            <input type="text" class="form-control" id="operatorName" placeholder="Enter Operator Name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="subDomain">Sub Domain</label>
+                            <input type="text" class="form-control" id="subDomain" placeholder="Enter Sub Domain" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select class="form-control" id="country">
+                                <option value="N">National (N) </option>
+                                <option value="A">Africa (A) </option>
+                                <option value="I">Indonesia (I) </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-2">
+                        <label for="version_name">Version</label>
+                        <input type="text" class="form-control" id="version_name" placeholder="Enter Version Name" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="version_code">Version Code</label>
+                        <input type="text" class="form-control" id="version_code" placeholder="Enter Version Code" required>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="packageName">Package Name</label>
+                            <input type="text" class="form-control" id="packageName" placeholder="Enter Package Name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="developerName">Developer Name</label>
+                            <input type="text" class="form-control" id="developerName" placeholder="Enter Developer Name" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="keyFile">Key File Name</label>
+                            <input type="text" class="form-control" id="keyFile" placeholder="Enter Key File Name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="aliasName">Alias Name</label>
+                        <input type="text" class="form-control" id="aliasName" placeholder="Enter Alias Name" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="password">Key Password</label>
+                        <input type="text" class="form-control" id="password" placeholder="Enter Password" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="baseUrl">Base URL</label>
+                            <input type="url" class="form-control" id="baseUrl" placeholder="Enter Base URL" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="region">Region</label>
+                            <input type="text" class="form-control" id="region" placeholder="Enter Region" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="playStoreLink">Google Play Store Link</label>
+                            <input type="url" class="form-control" id="playStoreLink" placeholder="Enter Play Store Link" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="playstore_update_date">Play Store Upload Date</label>
+                            <input type="date" class="form-control" id="playstore_update_date" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="analyticsEmail">Analytics Email ID</label>
+                            <input type="email" class="form-control" id="analyticsEmail" placeholder="Enter Analytics Email" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="analyticsProperty">Analytics Property Name</label>
+                            <input type="text" class="form-control" id="analyticsProperty" placeholder="Enter Analytics Property Name" required>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mb-5 btn-block">Create Entry</button>
+            </form>
+        </div>
+
+        
+
+        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        
+        <script>
+            $(document).ready(function() {
+                // const API_URL = "https://script.google.com/macros/s/AKfycbyN92CNP9xwCIBkFSonIuYQpGQMRATgpWtax3U1Qs2vWUiR7rPAagPNgpvCebsn2_gZ/exec";
+                const API_URL = "https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec";
+                storedEmpId = sessionStorage.getItem("empid");
+                sessionemptoken = sessionStorage.getItem("emptoken");
+                var oldSubdomain = "";
+                sessionemprole = sessionStorage.getItem("emprole");
+
+                if(sessionemprole=="appdeveloper"){
+                    $("#menu_dashboard").hide();
+                    $("#menu_download_script").hide();
+                } else if(sessionemprole=="support"){
+                    $("#menu_download_script").hide();
+                    $("#menu_create_new_operator").hide();
+                }
+
+                if (!storedEmpId || !sessionemptoken) {
+                    window.location.href = "index.html";
+                }
+                
+                $("#logout").click(function(){
+                    sessionStorage.clear();
+                    window.location.href = "index.html";
+                });
+
+            
+                $("#CreateForm").submit(function (event) {
+                    event.preventDefault(); // Prevent default form submission
+                    $('#loader').removeClass("d-none");
+                    $("#CreateForm button[type='submit']").prop('disabled', true);
+                    // Collect form data
+                    const formData = {
+                        operatorName: $("#operatorName").val(),       // Operator Name
+                        subDomain: $("#subDomain").val(),            // Sub Domain
+                        country: $("#country").val(),                // Country
+                        versionName: $("#version_name").val(),       // Version Name
+                        versionCode: $("#version_code").val(),       // Version Code
+                        packageName: $("#packageName").val(),        // Package Name
+                        developerName: $("#developerName").val(),    // Developer Name
+                        keyFile: $("#keyFile").val(),                // Key File Name
+                        aliasName: $("#aliasName").val(),            // Alias Name
+                        password: $("#password").val(),         // Key Password
+                        baseUrl: $("#baseUrl").val(),                // Base URL
+                        region: $("#region").val(),                  // Region
+                        playStoreLink: $("#playStoreLink").val(),    // Google Play Store Link
+                        playStoreUploadDate: $("#playstore_update_date").val(), // Play Store Upload Date
+                        analyticsEmail: $("#analyticsEmail").val(),  // Analytics Email ID
+                        analyticsProperty: $("#analyticsProperty").val() // Analytics Property Name
+                    };
+                    const formDataString = JSON.stringify(formData);
+                    console.log(btoa(formDataString));
+                    const formDataBase64 = encodeURIComponent(btoa(formDataString));
+                    // console.log(formDataBase64);
+                    // console.log(`https://script.google.com/macros/s/AKfycbyN92CNP9xwCIBkFSonIuYQpGQMRATgpWtax3U1Qs2vWUiR7rPAagPNgpvCebsn2_gZ/exec?create_entry=true&authtoken=${sessionemptoken}&empid=${storedEmpId}&datahash=${formDataBase64}`);
+                    // $("#UpdateForm button[type='submit']").prop('disabled', false);
+                    // $('#loader').addClass("d-none");
+                    $.ajax({
+                        url: `${API_URL}?create_entry=true&authtoken=${sessionemptoken}&empid=${storedEmpId}&datahash=${formDataBase64}`,
+                        type: 'GET',
+                        success: function (response) {
+                            $("#UpdateForm button[type='submit']").prop('disabled', false);
+                            if(response.code == 200){
+                                console.log(response);
+                                //$('#loader').addClass("d-none");
+                                alert(response.message);
+                                window.location.href = "home.html";
+                            }else{
+                                console.log(response.message);
+                                alert(response.message);
+                                $('#loader').addClass("d-none");
+                            }
+                            
+                        },
+                        error: function (xhr, status, error) {
+                            $("#UpdateForm button[type='submit']").prop('disabled', false);
+                            alert(`Error: ${error}`);
+                            console.log(`Error: ${error}`);
+                            $('#loader').addClass("d-none");
+                        }
+                    });
+                });
+            });
+            
+        </script>
+    </body>
+</html>

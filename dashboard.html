@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+        <title>Operator Lists</title>
+        <style>
+            body {
+                padding-top: 55px;  /* Adjust this value depending on the height of your navbar */
+            }
+            #loader{
+                display: block;
+                position: fixed;
+                background: #00000054;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                padding-top: 15%;
+            }
+            .table-wrapper {
+                overflow-x: auto;
+                max-width: 100%;
+            }
+            .table-wrapper table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .table-responsive {
+                margin-bottom: 15px;
+            }
+            .count-section {
+                margin-top: 20px;
+                margin-bottom: 30px;
+            }
+            .count-item {
+                margin-bottom: 10px;
+            }
+            .dt-length label{
+                margin-left: 10px;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div id="loader" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" >
+            <a class="navbar-brand" href="#">Bitla Software</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" id="menu_home">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item active" id="menu_dashboard">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item" id="menu_create_new_operator">
+                        <a class="nav-link" href="createoperator.html">Create New Operator</a>
+                    </li>
+                    <li class="nav-item" id="menu_download_script">
+                        <a class="nav-link" href="downloadScript.html">Download Script File</a>
+                    </li>
+                    <li class="nav-item" id="menu_logout">
+                        <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            <br/>
+            <div class="countdata">
+                <div class="row">
+                    <!-- Total Count Card -->
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header" data-toggle="collapse" data-target="#totalCountCollapse" aria-expanded="true" style="cursor: pointer;">
+                                <strong>Total Count</strong>
+                            </div>
+                            <div id="totalCountCollapse" class="collapse show">
+                                <div class="card-body">
+                                    <h5 class="card-title"><span id="totalCount">0</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Build Required Counts Card -->
+                    <div class="col-md-12 mt-4" id="build_required_count">
+                        <div class="card">
+                            <div class="card-header" data-toggle="collapse" data-target="#buildRequiredCountsCollapse" aria-expanded="false" style="cursor: pointer;">
+                                <strong>Build Required Counts</strong>
+                            </div>
+                            <div id="buildRequiredCountsCollapse" class="collapse">
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Build Number</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="buildRequiredCounts">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Country Wise Counts Card -->
+                    <div class="col-md-12 mt-4" id="country_count">
+                        <div class="card">
+                            <div class="card-header" data-toggle="collapse" data-target="#countryWiseCountsCollapse" aria-expanded="false" style="cursor: pointer;">
+                                <strong>Country Wise Counts</strong>
+                            </div>
+                            <div id="countryWiseCountsCollapse" class="collapse">
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Country</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="countryWiseCounts">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Region Wise Counts -->
+                    <div class="col-md-12 mt-4">
+                        <div class="card">
+                            <div class="card-header" data-toggle="collapse" data-target="#regionWiseCountsCollapse" aria-expanded="false" style="cursor: pointer;">
+                                <strong>Region Wise Counts</strong>
+                            </div>
+                            <div id="regionWiseCountsCollapse" class="collapse">
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Region</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="regionWiseCounts">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Email and Property Wise Counts -->
+                    <div class="col-md-12 mt-4" id="email_property_count">
+                        <div class="card">
+                            <div class="card-header" data-toggle="collapse" data-target="#emailPropertyCountsCollapse" aria-expanded="false" style="cursor: pointer;">
+                                <strong>Email and Property Wise Counts</strong>
+                            </div>
+                            <div id="emailPropertyCountsCollapse" class="collapse">
+                                <div class="card-body">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Email</th>
+                                                <th>Property</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="emailPropertyCounts">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
+
+
+        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // const API_URL = "https://script.google.com/macros/s/AKfycbyN92CNP9xwCIBkFSonIuYQpGQMRATgpWtax3U1Qs2vWUiR7rPAagPNgpvCebsn2_gZ/exec";
+                const API_URL = "https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec";
+
+                storedEmpId = sessionStorage.getItem("empid");
+                sessionemptoken = sessionStorage.getItem("emptoken");
+                sessionemprole = sessionStorage.getItem("emprole");
+
+                if(sessionemprole=="appdeveloper"){
+                    $("#menu_dashboard").hide();
+                    $("#menu_download_script").hide();
+                } else if(sessionemprole=="support"){
+                    $("#menu_download_script").hide();
+                    $("#menu_create_new_operator").hide();
+                    $("#build_required_count").hide();
+                    $("#email_property_count").hide();
+                    $("#country_count").hide();
+                }
+
+
+                if (!storedEmpId || !sessionemptoken) {
+                    window.location.href = "index.html";
+                }else{
+                    loadDataTable(storedEmpId,sessionemptoken);
+                }
+
+                $("#logout").click(function(){
+                    sessionStorage.clear();
+                    window.location.href = "index.html";
+                });
+                
+
+                function loadDataTable(empid, sessionemptoken) {
+                    $('#loader').removeClass("d-none");
+
+                    $.ajax({
+                        url: `${API_URL}?authtoken=${sessionemptoken}&fetch_entry=true&empid=${empid}`,
+                        type: 'GET',
+                        success: function (response) {
+                            $('#loader').addClass("d-none");
+                            if(response.code == 200){
+                                const data = response.app_lists;
+                                
+                                // Initialize counters
+                                let buildCounts = {};
+                                let countryCounts = {};
+                                let regionCounts = {}; 
+                                let emailPropertyCounts = {};
+
+                                // Loop through the data to aggregate counts
+                                data.forEach(item => {
+                                    // Process the build_required field (Assumes each row has a single value for this field)
+                                    const buildRequiredValue = item.build_required; // Just one value per row
+                                    if (buildRequiredValue) {
+                                        if (buildCounts[buildRequiredValue]) {
+                                            buildCounts[buildRequiredValue]++;
+                                        } else {
+                                            buildCounts[buildRequiredValue] = 1;
+                                        }
+                                    }
+
+                                    // Country-wise count
+                                    const country = item.country_name || "Unknown";
+                                    if (countryCounts[country]) {
+                                        countryCounts[country]++;
+                                    } else {
+                                        countryCounts[country] = 1;
+                                    }
+
+                                    // Region-wise count
+                                    const region = item.region || "Unknown";
+                                    if (regionCounts[region]) {
+                                        regionCounts[region]++;
+                                    } else {
+                                        regionCounts[region] = 1;
+                                    }
+
+                                    const email = item.analytics_email || "Unknown";
+                                    const property = item.analytics_property || "Unknown";
+
+                                    // Initialize email group if not already present
+                                    if (!emailPropertyCounts[email]) {
+                                        emailPropertyCounts[email] = {};
+                                    }
+
+                                    // Increment count for the specific property under the email
+                                    emailPropertyCounts[email][property] = (emailPropertyCounts[email][property] || 0) + 1;
+                
+                                });
+
+                                // Display total count
+                                $('#totalCount').text(data.length);
+
+                                // Display Build Required Counts
+                                let buildRequiredHtml = '';
+                                for (let build in buildCounts) {
+                                    buildRequiredHtml += `<tr><td>${build}</td> <td>${buildCounts[build]}</td></tr>`;
+                                }
+                                $('#buildRequiredCounts').html(buildRequiredHtml);
+
+                                // Display Country Wise Counts
+                                let countryWiseHtml = '';
+                                for (let country in countryCounts) {
+                                    countryWiseHtml += `<tr><td>${country}</td> <td> ${countryCounts[country]}</td></tr>`;
+                                }
+                                $('#countryWiseCounts').html(countryWiseHtml);
+
+                                // Display Region Wise Counts
+                                let regionWiseHtml = '';
+                                for (let region in regionCounts) {
+                                    regionWiseHtml += `<tr><td>${region}</td> <td> ${regionCounts[region]}</td></tr>`;
+                                }
+                                $('#regionWiseCounts').html(regionWiseHtml);
+
+                                // Generate the HTML for the nested format
+                                let emailPropertyHtml = '';
+                                for (let email in emailPropertyCounts) {
+                                    const properties = emailPropertyCounts[email];
+                                    for (let property in properties) {
+                                        emailPropertyHtml += `
+                                            <tr>
+                                                <td>${email}</td>
+                                                <td>${property}</td>
+                                                <td>${properties[property]}</td>
+                                            </tr>`;
+                                    }
+                                }
+
+                                // Inject the HTML into the table
+                                $('#emailPropertyCounts').html(emailPropertyHtml);
+
+                                $('#loader').addClass("d-none");
+                            }else{
+                                console.log(response.message);
+                                alert(response.message);
+                            }
+                            
+                        },
+                        error: function (xhr, status, error) {
+                            alert(`Error: ${error}`);
+                            console.log(`Error: ${error}`);
+                            $('#loader').addClass("d-none");
+                        }
+                    });
+                
+                }
+            });
+
+        </script>
+    </body>
+</html>
