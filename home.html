@@ -162,6 +162,7 @@
                     <thead>
                         <tr>
                             <th>Select</th>
+                            <th>Action</th>
                             <th>Build Required</th>
                             <th>Version</th>
                             <th>Version Code</th>
@@ -179,7 +180,6 @@
                             <th>Region</th>
                             <th>Analytics Email</th>
                             <th>Analytics Property</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -274,6 +274,19 @@
                                     return `<input type="checkbox" class="rowCheckbox" data-subdomain="${data}">`;
                                 }
                             },
+                            {
+                                data: 'sub_domain',
+                                render: function (data, type, row) {
+                                    // Check if the render type is 'display' for DataTables
+                                    if (type === 'display' && sessionemprole!="support") {
+                                        const base64Encoded = btoa(storedEmpId+":"+data.trim()+":"+sessionemptoken);
+                                        return `<input type="button" class="btn btn-primary editBtn" value="Edit" data-subdomain="${base64Encoded}">`;
+                                    }else{
+                                        return `<input type="button" class="btn btn-secondary" disabled value="Edit">`;
+                                    }
+                                    return data; // Return raw data for export or other processing
+                                }
+                            },
                             { data: 'build_required' },
                             { data: 'version' },
                             { data: 'version_code' },
@@ -301,20 +314,7 @@
                             },
                             { data: 'region' },
                             { data: 'analytics_email' },
-                            { data: 'analytics_property' },
-                            {
-                                data: 'sub_domain',
-                                render: function (data, type, row) {
-                                    // Check if the render type is 'display' for DataTables
-                                    if (type === 'display' && sessionemprole!="support") {
-                                        const base64Encoded = btoa(storedEmpId+":"+data.trim()+":"+sessionemptoken);
-                                        return `<input type="button" class="btn btn-primary editBtn" value="Edit" data-subdomain="${base64Encoded}">`;
-                                    }else{
-                                        return `<input type="button" class="btn btn-secondary" disabled value="Edit">`;
-                                    }
-                                    return data; // Return raw data for export or other processing
-                                }
-                            }
+                            { data: 'analytics_property' }
                         ],
                         processing: true,
                         responsive: true,
