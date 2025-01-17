@@ -246,12 +246,6 @@
 
                 function loadDataTable(empid, sessionemptoken,sessionemprole) {
                     $('#loader').removeClass("d-none");
-
-                    if(sessionemprole=="support"){
-                        $('#submitButton').hide();
-                    }else{
-                        $('#submitButton').show();
-                    }
                     
                     $('.count-section, .countdata').show();
                     let selectedSubdomains = new Set();
@@ -396,6 +390,11 @@
                     // Maintain checkbox states when changing pages
                     table.on('draw', function () {
                         $(".table-wrapper").show();
+                        if(sessionemprole=="support"){
+                            $('#submitButton').hide();
+                        }else{
+                            $('#submitButton').show();
+                        }
                         $('#example tbody .rowCheckbox').each(function () {
                             const subdomain = $(this).data('subdomain');
                             $(this).prop('checked', selectedSubdomains.has(subdomain));
