@@ -308,15 +308,11 @@
                             {
                                 extend: 'excelHtml5',
                                 text: 'Download Excel',
-                                action: function (e, dt, button, config) {
-                                    // Get the visible columns
-                                    const visibleColumns = dt.columns(':visible').indexes().toArray();
-                                    
-                                    // Customize export configuration to include only visible columns
-                                    config.columns = visibleColumns;  // Only export visible columns
-
-                                    // Perform the export directly without triggering the button
-                                    new $.fn.dataTable.ext.buttons.excelHtml5.action(e, dt, button, config);
+                                exportOptions: {
+                                    columns: function (idx, data, node) {
+                                        // Return the column index if it is visible (not hidden)
+                                        return table.column(idx).visible();
+                                    }
                                 }
                             },
                             'excel', // Copy to clipboard
