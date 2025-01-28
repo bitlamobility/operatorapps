@@ -309,13 +309,14 @@
                                 extend: 'excelHtml5',
                                 text: 'Download Excel',
                                 action: function (e, dt, button, config) {
-                                    // Customize the Excel export here, based on role
+                                    // Get the visible columns
                                     const visibleColumns = dt.columns(':visible').indexes().toArray();
-                                    const filteredConfig = {
-                                        ...config,
-                                        columns: visibleColumns // Export only visible columns
-                                    };
-                                    dt.button(0).trigger('click', filteredConfig); // Trigger the Excel export with filtered columns
+                                    
+                                    // Customize export configuration to include only visible columns
+                                    config.columns = visibleColumns;  // Only export visible columns
+
+                                    // Perform the export directly without triggering the button
+                                    new $.fn.dataTable.ext.buttons.excelHtml5.action(e, dt, button, config);
                                 }
                             },
                             'excel', // Copy to clipboard
