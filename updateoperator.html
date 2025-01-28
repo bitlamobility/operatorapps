@@ -59,10 +59,16 @@
             
             <form id="UpdateForm">
                 <div class="form-row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="operatorName">Operator Name</label>
                             <input type="text" class="form-control" id="operatorName" placeholder="Enter Operator Name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="travelCode">Travel Code</label>
+                            <input type="text" class="form-control" id="travelCode" placeholder="Enter Travel Code" required>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -71,7 +77,7 @@
                             <input type="text" class="form-control" id="subDomain" placeholder="Enter Sub Domain" required>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label for="country">Country</label>
                             <select class="form-control" id="country">
@@ -269,6 +275,7 @@
                 // }
 
                 function fillForm(appData) {
+                    $("#travelCode").val(appData.travel_code);
                     $("#subDomain").val(appData.sub_domain);
                     $("#keyFile").val(appData.key_file_name);
                     $("#aliasName").val(appData.alias_name);
@@ -322,11 +329,12 @@
                         version_name: $("#version_name").val(), // Collect Version Name
                         version_code: $("#version_code").val(), // Collect Version Code
                         playstore_upload_date: $("#playstore_update_date").val(), // Collect Play Store Upload Date
+                        travelCode: $("#travelCode").val() // Collect Play Store Upload Date
                     };
                     const formDataString = JSON.stringify(formData);
                     //console.log(btoa(formDataString));
                     const formDataBase64 = encodeURIComponent(btoa(formDataString));
-                    console.log(formDataBase64);
+                    //console.log(formDataBase64);
                     //console.log(`${API_URL}?update_entry=true&subdomain=${oldSubdomain}&authtoken=${sessionemptoken}&empid=${storedEmpId}&datahash=${formDataBase64}`);
                     $.ajax({
                         url: `${API_URL}?update_entry=true&subdomain=${oldSubdomain}&authtoken=${sessionemptoken}&empid=${storedEmpId}&datahash=${formDataBase64}`,
