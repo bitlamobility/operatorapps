@@ -305,8 +305,21 @@
                         },
                         dom: 'Bfrtip', // This option will place the buttons at the top of the table
                         buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: 'Download Excel',
+                                action: function (e, dt, button, config) {
+                                    // Customize the Excel export here, based on role
+                                    const visibleColumns = dt.columns(':visible').indexes().toArray();
+                                    const filteredConfig = {
+                                        ...config,
+                                        columns: visibleColumns // Export only visible columns
+                                    };
+                                    dt.button(0).trigger('click', filteredConfig); // Trigger the Excel export with filtered columns
+                                }
+                            },
+                            'excel', // Copy to clipboard
                             'csv',  // Export to CSV
-                            'excel' // Export to Excel
                         ]
                     });
 
