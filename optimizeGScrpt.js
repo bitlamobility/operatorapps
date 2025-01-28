@@ -1,248 +1,192 @@
+// Global Configuration
+const SHEET_ID = "1knNG4KInzBRq0VlUZUjhU_DLX0peZtzZUZTA5wg6SJY";
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Cached Sheet Management
+let APP_LISTS_SHEET = null;
+let CREDENTIALS_SHEET = null;
+let APP_LISTS_CACHE = null;
+let CREDENTIALS_CACHE = null;
+
+// Safe Execution Wrapper
+function safeExecute(fn) {
+    try {
+        return fn();
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        return createJsonResponse(`Execution error: ${error.message}`, true, 500);
+    }
+}
+
+// Efficient Sheet Fetching
+function fetchAppSheet() {
+    if (!APP_LISTS_SHEET) {
+        const doc = SpreadsheetApp.openById(SHEET_ID);
+        APP_LISTS_SHEET = doc.getSheetByName('APPLISTS');
+    }
+    return APP_LISTS_SHEET || -1;
+}
+
+function credentialsSheet() {
+    if (!CREDENTIALS_SHEET) {
+        const credentialsdoc = SpreadsheetApp.openById(SHEET_ID);
+        CREDENTIALS_SHEET = credentialsdoc.getSheetByName('credentials');
+    }
+    return CREDENTIALS_SHEET || -1;
+}
+
+// Cached Data Range
+function cacheDataRange(sheet) {
+    return {
+        values: sheet.getDataRange().getValues(),
+        timestamp: new Date().getTime()
+    };
+}
+
+// Main Entry Point
 function doGet(req) {
-    var empid = req.parameter.empid;
-    var emppass = req.parameter.emppass;
-    var authtoken = req.parameter.authtoken;
-    var subdomains = req.parameter.subdomains;
-    var subdomain = req.parameter.subdomain;
-    var newPass = req.parameter.newPass;
-    var build_number = req.parameter.build_number;
-    var is_from_script = req.parameter.is_from_script === 'true';
-    var update_entry = req.parameter.update_entry === 'true';
-    var create_entry = req.parameter.create_entry === 'true';
-    var fetch_entry = req.parameter.fetch_entry === 'true';
-    var fetch_only_subdomain = req.parameter.fetch_only_subdomain === 'true';
-    var forgetpass = req.parameter.forgetpass === 'true';
-    var emplogin = req.parameter.emplogin === 'true';
-    var datahash = req.parameter.datahash;
+    return safeExecute(() => {
+        const {
+            empid = '', emppass = '', authtoken = '', 
+            subdomains = '', subdomain = '', newPass = '', 
+            build_number = '', is_from_script = false,
+            update_entry = false, create_entry = false,
+            fetch_entry = false, fetch_only_subdomain = false,
+            forgetpass = false, emplogin = false,
+            datahash = ''
+        } = req.parameter;
 
-    // var authtoken = "";
-    // var empid = "BS1614";
-    // var is_from_script = false;
-    // var emppass = "Bitla@123";
-    // var subdomains = "";
-    // var subdomain = "";
-    // var build_number = "";
-    // var update_entry = false;
-    // var create_entry = false;
-    // var fetch_entry = false;
-    // var forgetpass = false;
-    // var fetch_only_subdomain = false;
-    // var emplogin = true;
-    // var datahash = "";
-    // var newPass = ""
+        const appListsSheet = fetchAppSheet();
+        const credentialSheet = credentialsSheet();
 
-
-    var appListsSheet = fetchAppSheet();
-    if (appListsSheet == -1) {
-      return createJsonResponse("Sheet 'APPLISTS' not found.",true);
-    }
-
-    var credentialSheet = credentialsSheet();
-    if (credentialSheet == -1) {
-      return createJsonResponse("Sheet 'credentials' not found.",true);
-    }
-
-    if(is_from_script){
-        if(build_number!="" && subdomain!="" && update_entry){
-            // Change Auto generated Build Number to 200 consider build generated
-            return buildNumberRevert(appListsSheet,build_number,subdomain);
-
-        }else if(build_number!="" && fetch_entry){
-            // Fetch App list with respect of build number
-            return fetchScriptAppLists(appListsSheet,build_number);
-
-        }else{
-            // Error File error
-            return createJsonResponse("No matching requests!",true);
-        }
-    }
-    if(forgetpass){
-        //
-        if (typeof empid === 'string' && empid.trim() !== "" && typeof newPass === 'string' && newPass.trim() !== "" && typeof authtoken === 'string' && authtoken.trim() !== "") {
-            //console.log("daaa");
-            //return createJsonResponse("No matching forget !",true);
-            return forgetPasswordTwo(credentialSheet,empid, authtoken, newPass);
-        }
-        if(empid!=""){
-            //return createJsonResponse("No matching forget 23!",true);
-            //forget password
-            // Step - 1: check empid valid or not
-            // Step - 2: If valid check email id present or not? If email present sent email.
-            // Step - 3: proceed next page with authtoken(valid for 30min) 
-            // Step - 4: enter OTP(from email), newpass , confirmpass and token
-            // Step - 5: Valid everything correct change password.
-            return forgetPasswordOne(credentialSheet,empid);
-        }
-    }
-    if(emplogin){
-        //return createJsonResponse("No matching emplogin !",true);
-
-        if(empid!="" && emppass!="") {
-            return employeelogin(credentialSheet,empid,emppass);
-        }
-    }
-    
-    if(authtoken!="" && empid!=""){
-        var response = isValidToken(credentialSheet,authtoken, empid);
-        console.log("00"+JSON.stringify(response));
-        if (response.code === 200) {
-            if(fetch_only_subdomain && typeof subdomain === 'string' && subdomain.trim() !== ""){
-                return fetchOnlySubdomain(appListsSheet,subdomain);
+        if (is_from_script) {
+            if (build_number && subdomain && update_entry) {
+                return buildNumberRevert(appListsSheet, build_number, subdomain);
+            } else if (build_number && fetch_entry) {
+                return fetchScriptAppLists(appListsSheet, build_number);
             }
+        }
 
-            if(update_entry && typeof subdomain === 'string' && subdomain.trim() !== "" && typeof datahash === 'string' && datahash.trim() !== ""){
-                // Consider update the entry with valid subdomain and also whatever data send only those data will update 
-                // console.log("44");
-                return updateOperatorEntry(appListsSheet,subdomain,datahash,empid);
-
+        if (forgetpass) {
+            if (empid && newPass && authtoken) {
+                return forgetPasswordTwo(credentialSheet, empid, authtoken, newPass);
+            } else if (empid) {
+                return forgetPasswordOne(credentialSheet, empid);
             }
+        }
 
-            if(create_entry && typeof datahash === 'string' && datahash.trim() !== ""){
-                // Consider this is new entry should append on the last row of excel
-                console.log("33");
-                return newOperatorEntry(appListsSheet,datahash);
+        if (emplogin && empid && emppass) {
+            return employeelogin(credentialSheet, empid, emppass);
+        }
 
+        if (authtoken && empid) {
+            const response = isValidToken(credentialSheet, authtoken, empid);
+            if (response.code === 200) {
+                if (fetch_only_subdomain && subdomain) {
+                    return fetchOnlySubdomain(appListsSheet, subdomain);
+                }
+
+                if (update_entry && subdomain && datahash) {
+                    return updateOperatorEntry(appListsSheet, subdomain, datahash, empid);
+                }
+
+                if (create_entry && datahash) {
+                    return newOperatorEntry(appListsSheet, datahash);
+                }
+
+                if (authtoken && fetch_entry) {
+                    return fetchAppLists(appListsSheet);
+                } else if (authtoken && subdomains) {
+                    return buildNumberGeneration(appListsSheet, subdomains);
+                }
             }
-
-            if(authtoken!="" && fetch_entry){
-                // Consider this is first fetch data to show in front UI
-                console.log("11");
-                return fetchAppLists(appListsSheet);
-                
-            }else if(authtoken!="" && subdomains!=""){
-                // Consider this is required to generate Build Number
-                console.log("22");
-                return buildNumberGeneration(appListsSheet,subdomains);
-
-            } else{
-                console.log("55");
-                // Throw error as there are no matching requests.
-                return createJsonResponse("No matching requests!",true);
-            }
-        }else{
-            console.log("66 Error => "+JSON.stringify(response));
             return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
         }
-    }
-       
-    // Throw error as there are no matching requests.
-    return createJsonResponse("No matching requests!",true);
-    
+
+        return createJsonResponse("No matching requests!", true);
+    });
 }
 
-function fetchAppSheet(){
-    var sheetId = "1knNG4KInzBRq0VlUZUjhU_DLX0peZtzZUZTA5wg6SJY";
-    var doc = SpreadsheetApp.openById(sheetId);
-    var sheet = doc.getSheetByName('APPLISTS');
-
-    if (!sheet) {
-      return -1;
-    }
-
-    return sheet;
-}
-
-function credentialsSheet(){
-    var sheetId = "1knNG4KInzBRq0VlUZUjhU_DLX0peZtzZUZTA5wg6SJY";
-    var credentialsdoc = SpreadsheetApp.openById(sheetId);
-    var credentialSheet = credentialsdoc.getSheetByName('credentials');
-    return credentialSheet;
-}
-
-function createJsonResponse(message,is_json_Return=false,code=400) {
-    var response = {
-      code: code,
-      message: message
+// Utility Functions
+function createJsonResponse(message, is_json_Return = false, code = 400) {
+    const response = {
+        code: code,
+        message: message
     };
     
-    if(is_json_Return){
-      return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
-    }else{
-      return response;
-    } 
+    return is_json_Return
+        ? ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON)
+        : response;
 }
 
 function findRowBySubdomain(subdomain, data) {
     const subdomainColumnIndex = 3;
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][subdomainColumnIndex].toString().trim() === subdomain) {
-        return i + 1;
-      }
-    }
-    return -1;
+    return data.findIndex((row, index) => 
+        index > 0 && row[subdomainColumnIndex].toString().trim() === subdomain
+    ) + 1;
 }
 
-function findRowIndex(empId, empPass, svalues,onlyempId=false) {
-    for (let i = 1; i < svalues.length; i++) {
-        if(onlyempId){
-            if (svalues[i][0].toString().trim() === empId) {
-                return i + 1;
-            }
-        }else{
-            if (svalues[i][0].toString().trim() === empId && svalues[i][2].toString().trim() === empPass) {
-                return i + 1;
-            }
-        }
-       
-    }
-    return -1;
+function findRowIndex(empId, empPass, svalues, onlyempId = false) {
+    return svalues.findIndex((row, index) => 
+        index > 0 && 
+        (onlyempId 
+            ? row[0].toString().trim() === empId
+            : row[0].toString().trim() === empId && row[2].toString().trim() === empPass)
+    ) + 1;
 }
 
-function generateAccessToken(secret,setdays=true,dvalue=2,setmin=false,fgetotp="") {
-    //var timestamp = new Date().getTime().toString();
-    var timestamp = getFormattedDate(setdays,dvalue,setmin)
-    var randomValue = Math.floor(Math.random() * 1000000).toString();
-    if(fgetotp!=""){
-        var token = secret + ":" + timestamp + ":" + randomValue+"k"+fgetotp;
-    }else{
-        var token = secret + ":" + timestamp + ":" + randomValue;
-    }
-    var accessToken = Utilities.base64EncodeWebSafe(token).replace(/=+$/, '');
-    //Logger.log("Generated Access Token: " + accessToken);
-    return accessToken;
+function generateAccessToken(secret, options = {}) {
+    const { 
+        setdays = true, 
+        dvalue = 2, 
+        setmin = false, 
+        fgetotp = "" 
+    } = options;
+
+    const timestamp = getFormattedDate(setdays, dvalue, setmin);
+    const randomValue = Math.floor(Math.random() * 1000000).toString();
+    
+    const token = fgetotp 
+        ? `${secret}:${timestamp}:${randomValue}k${fgetotp}`
+        : `${secret}:${timestamp}:${randomValue}`;
+    
+    return Utilities.base64EncodeWebSafe(token).replace(/=+$/, '');
 }
 
-function SixDigitOTP(){
-    return Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+function SixDigitOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString().padStart(6, '0');
 }
 
 function decodeAccessToken(encodedToken) {
-    // Convert URL-safe Base64 to standard Base64
-    var base64String = encodedToken
-        .replace(/-/g, '+')   // Replace `-` with `+`
-        .replace(/_/g, '/');   // Replace `_` with `/`
+    const base64String = encodedToken
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
 
-    // Decode the Base64 string using Google Apps Script's Utilities.base64Decode
-    var decodedBytes = Utilities.base64Decode(base64String);
-    
-    // Convert the bytes to a string (assuming UTF-8 encoding)
-    var decodedString = Utilities.newBlob(decodedBytes).getDataAsString();
-    
-    return decodedString;
+    const decodedBytes = Utilities.base64Decode(base64String);
+    return Utilities.newBlob(decodedBytes).getDataAsString();
 }
 
 function encryptPassword(password) {
     return Utilities.base64Encode(Utilities.newBlob(password).getBytes());
 }
 
-function isValidToken(credentialSheet,token, secretkey) {
-
-    var credentialSheetValues = credentialSheet.getDataRange().getValues();
-    var filteredRows = credentialSheetValues.slice(1).filter(row => row[3].toString().trim() === token);
+function isValidToken(credentialSheet, token, secretkey) {
+    const credentialSheetValues = credentialSheet.getDataRange().getValues();
+    const filteredRows = credentialSheetValues.slice(1).filter(row => row[3].toString().trim() === token);
 
     if (filteredRows.length === 0) {
         return createJsonResponse("Access Token Invalid!-1");
     }
 
     try {
-        var savedTimestamp = filteredRows[0][4].toString().trim();
-        var decodedToken = decodeAccessToken(token);
+        const savedTimestamp = filteredRows[0][4].toString().trim();
+        const decodedToken = decodeAccessToken(token);
 
-        var [decodedSecret, timestamp, randomValue] = decodedToken.split(":");
+        const [decodedSecret, timestamp, randomValue] = decodedToken.split(":");
 
         if (decodedSecret === secretkey) {
-            var currentTimestamp = new Date().getTime();
-            var differenceInSeconds = Math.floor((savedTimestamp - currentTimestamp) / 1000);
+            const currentTimestamp = new Date().getTime();
+            const differenceInSeconds = Math.floor((savedTimestamp - currentTimestamp) / 1000);
 
             if (differenceInSeconds <= 0) {
                 return createJsonResponse("Access Token Expired!");
@@ -267,36 +211,28 @@ function isValidToken(credentialSheet,token, secretkey) {
 }
 
 function decryptPassword(base64String) {
-    // Convert the URL-safe Base64 back to standard Base64
     let standardBase64 = base64String.replace(/-/g, '+').replace(/_/g, '/');
     
-    // Add padding ('=' characters) if necessary
     let padding = standardBase64.length % 4;
     if (padding > 0) {
-      standardBase64 += '='.repeat(4 - padding);  // Add '=' to make length a multiple of 4
+      standardBase64 += '='.repeat(4 - padding);
     }
     
-    // Decode the Base64 string
-    let decodedBytes = Utilities.base64Decode(standardBase64);
-    
-    // Convert bytes back to string
-    let decodedString = Utilities.newBlob(decodedBytes).getDataAsString();
-    
-    return decodedString;
+    const decodedBytes = Utilities.base64Decode(standardBase64);
+    return Utilities.newBlob(decodedBytes).getDataAsString();
 }
 
-function getFormattedDate(setdays=true,dvalue=2,setmin=false) {
-    var currentDate = new Date();  // Current date and time
-    if(setdays){
-        currentDate.setDate(currentDate.getDate() + dvalue);  // Add 2 days
+function getFormattedDate(setdays = true, dvalue = 2, setmin = false) {
+    const currentDate = new Date();
+    if (setdays) {
+        currentDate.setDate(currentDate.getDate() + dvalue);
     }
-    if(setmin){
+    if (setmin) {
         currentDate.setMinutes(currentDate.getMinutes() + dvalue);
     }
-    var timestamp = currentDate.getTime();  // Convert to timestamp
-    // Logger.log("Updated Timestamp: " + timestamp);
-    return timestamp;
+    return currentDate.getTime();
 }
+
 
 function sendOtpEmail(recipient,otp,updateEmail=false,update_subject="",oldData="",newData="",empID="") {
 

@@ -161,6 +161,21 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 
+        <!-- DataTables Buttons JS -->
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+
+        <!-- JSZip (for Excel export) -->
+        <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
+        <!-- PDFMake (for PDF export) -->
+        <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+
+        <!-- HTML5 export buttons (for CSV, Excel, PDF) -->
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+
+        <!-- Print button JS (this is the critical file for the print button) -->
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+
         <script>
             $(document).ready(function () {
                 // const API_URL = "https://script.google.com/macros/s/AKfycbyN92CNP9xwCIBkFSonIuYQpGQMRATgpWtax3U1Qs2vWUiR7rPAagPNgpvCebsn2_gZ/exec"; // my email
@@ -274,9 +289,9 @@
                         initComplete: function () {
                             
                             if (sessionemprole === 'support') {
-                                table.column(0).visible(false);  // Column index starts at 0
-                                table.column(1).visible(false);  // Column index starts at 0
-                                table.column(5).visible(false);  // Column index starts at 0
+                                // table.column(0).visible(false);  // Column index starts at 0
+                                // table.column(1).visible(false);  // Column index starts at 0
+                                table.column(4).visible(false);  // Column index starts at 0
                                 table.column(6).visible(false);  // Column index starts at 0
                                 table.column(7).visible(false);  // Column index starts at 0
                                 table.column(8).visible(false);  // Column index starts at 0
@@ -284,7 +299,12 @@
                                 table.column(17).visible(false);  // Column index starts at 0
                                 table.column(18).visible(false);  // Column index starts at 0
                             }
-                        }
+                        },
+                        dom: 'Bfrtip', // This option will place the buttons at the top of the table
+                        buttons: [
+                            'csv',  // Export to CSV
+                            'excel' // Export to Excel
+                        ]
                     });
 
                     // Handle checkbox selection
