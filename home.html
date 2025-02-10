@@ -96,7 +96,7 @@
                 <p class="mb-0">Operator Android App lists in Bitla</p>
             </div> -->
             <div class="card mb-3 py-3">
-                <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="card-header d-flex align-items-center justify-content-between bg-warning">
                     <!-- Text -->
                     <span class="h5">Bitla Software App Lists</span>
                     <!-- Input Box & Button -->
@@ -108,7 +108,7 @@
                 <div class="card-body" style="max-height: 700px; overflow-y: auto;">
                     <div class="table-wrapper">
                         <table class="table table-bordered" id="example">
-                            <thead>
+                            <thead class="bg-success">
                                 <tr>
                                     <th>Select</th>
                                     <th>Action</th>
@@ -286,7 +286,8 @@
                         responsive: true,
                         scrollX: true,
                         searching: true,
-                        paging: false,
+                        paging: true,
+                        fixedHeader: true,
                         lengthMenu: [5, 10, 25, 50, 100],
                         initComplete: function () {
                             
