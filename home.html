@@ -26,7 +26,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item active" id="menu_home">
-                        <a class="nav-link" href="index.html">Home</a>
+                        <a class="nav-link" href="home.html">Home</a>
                     </li>
                     <li class="nav-item" id="menu_dashboard">
                         <a class="nav-link" href="dashboard.html">Dashboard</a>
@@ -36,6 +36,9 @@
                     </li>
                     <li class="nav-item" id="menu_download_script">
                         <a class="nav-link" href="downloadScript.html">Download Script File</a>
+                    </li>
+                    <li class="nav-item" id="menu_pushfile">
+                        <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
                     </li>
                     <li class="nav-item" id="menu_logout">
                         <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
@@ -168,6 +171,7 @@
                         $("#menu_create_new_operator").hide();
                         $("#downloadExcel").show();
                         $("#menu_dashboard").hide();
+                        $("#menu_pushfile").hide();
                     } else if(sessionemprole == "admin") {
                         $("#resetBuildButton").show();
                         $("#submitButton").show();
