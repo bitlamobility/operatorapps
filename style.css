@@ -91,3 +91,8 @@ body {
     transform: translateY(-1px);
     transition: transform 0.2s;
 }
+
+.dt-column-title{
+    text-align: center;
+    vertical-align: super;
+}
