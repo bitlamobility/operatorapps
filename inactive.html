@@ -25,7 +25,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active" id="menu_home">
+                    <li class="nav-item" id="menu_home">
                         <a class="nav-link" href="home.html">Home</a>
                     </li>
                     <li class="nav-item" id="menu_dashboard">
@@ -40,7 +40,7 @@
                     <li class="nav-item" id="menu_pushfile">
                         <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
                     </li>
-                    <li class="nav-item" id="menu_inactive">
+                    <li class="nav-item active" id="menu_inactive">
                         <a class="nav-link" href="inactive.html">Inactive Operators</a>
                     </li>
                     <li class="nav-item" id="menu_logout">
@@ -56,26 +56,17 @@
                 <p class="mb-0">Operator Android App lists in Bitla</p>
             </div> -->
             <div class="card mb-3 py-3">
-                <div class="card-header d-flex align-items-center justify-content-between bg-warning">
+                <div class="card-header d-flex align-items-center justify-content-between bg-danger">
                     <!-- Text -->
-                    <span class="h5 mb-0">Bitla Software App Lists</span>
+                    <span class="h5 mb-0 text-white">Bitla Software Inactive App Lists</span>
                     <!-- Input Box & Buttons -->
                     <div class="d-flex align-items-center">
                         <div class="input-group mr-2" style="width: 300px;">
                             <input type="text" id="customSearch" class="form-control" placeholder="Search any keywords...">
                         </div>
-                        
-                        <button id="submitButton" class="btn btn-primary d-flex align-items-center mr-2" style="height: 38px;display: none !important;">
-                            <i class="fas fa-cogs mr-1"></i>
-                            Generate Build
-                        </button>
-                        <button id="resetBuildButton" class="btn btn-danger d-flex align-items-center mr-2" style="height: 38px;display: none !important;">
-                            <i class="fas fa-rotate-left mr-1"></i>
-                            Reset Build
-                        </button>
                         <button id="movetoinvalid" class="btn btn-info d-flex align-items-center mr-2" style="height: 38px;">
                             <i class="fas fa-rotate-left mr-1"></i>
-                            Move to Invalid
+                            Move to Active
                         </button>
                         <button id="downloadExcel" class="btn btn-success d-flex align-items-center" style="height: 38px;display: none !important;">
                             <i class="fas fa-file-excel mr-1"></i>
@@ -86,10 +77,9 @@
                 <div class="card-body">
                     <div class="table-wrapper">
                         <table class="table table-bordered" id="example">
-                            <thead class="bg-success">
-                                <tr>
+                            <thead class="bg-danger">
+                                <tr class="text-white">
                                     <th>Select</th>
-                                    <th>Action</th>
                                     <th>Build Required</th>
                                     <th>Version</th>
                                     <th>Version Code</th>
@@ -122,14 +112,13 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Build Number</h5>
+                        <h5 class="modal-title">Message</h5>
                         <button type="button" class="close" id="responseModalClose">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body text-center">
                         <h5 id="responseMessage"></h5>
-                        <p>Note: Kindly use the above build number for build generation</p>
                     </div>
                 </div>
             </div>
@@ -180,11 +169,9 @@
                         $("#menu_dashboard").hide();
                         $("#menu_pushfile").hide();
                     } else if(sessionemprole == "admin") {
-                        $("#resetBuildButton").show();
                         $("#submitButton").show();
                         $("#downloadExcel").show();
                     } else if(sessionemprole == "maintainer") {
-                        $("#resetBuildButton").show();
                         $("#submitButton").show();
                         $("#downloadExcel").show();
                         $("#menu_download_script").hide();
@@ -220,7 +207,7 @@
 
                     const table = $('#example').DataTable({
                         ajax: {
-                            url: `${API_URL}?authtoken=${sessionemptoken}&fetch_entry=true&empid=${empid}`,
+                            url: `${API_URL}?authtoken=${sessionemptoken}&inActiveLists=true&empid=${empid}`,
                             //dataSrc: 'app_lists',
                             dataSrc: function (response) {
                                 // Check the response code
@@ -240,17 +227,6 @@
                                 data: 'sub_domain',
                                 render: function (data) {
                                     return `<input type="checkbox" name="${data}" class="rowCheckbox" data-subdomain="${data}">`;
-                                }
-                            },
-                            {
-                                data: 'sub_domain',
-                                render: function (data, type, row) {
-                                    // Check if the render type is 'display' for DataTables
-                                    if (type === 'display') {
-                                        const base64Encoded = btoa(storedEmpId+":"+data.trim()+":"+sessionemptoken);
-                                        return `<input type="button" class="btn btn-primary editBtn" value="Edit" data-subdomain="${base64Encoded}">`;
-                                    }
-                                    return data; // Return raw data for export or other processing
                                 }
                             },
                             { data: 'build_required' },
@@ -289,6 +265,7 @@
                         searching: true,
                         pageLength: 10,
                         paging: true,
+                        ordering: false,
                         fixedHeader: {
                             header: true,
                             headerOffset: 55  // Adjust this value based on your navbar height
@@ -296,10 +273,6 @@
                         scrollX: true,
                         scrollY: '60vh',     // Adjust the height as needed
                         scrollCollapse: true,
-                        'columnDefs': [ {
-                            'targets': [0,1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19], /* column index */
-                            'orderable': false, /* true or false */
-                        }],
                         lengthMenu: [5, 10, 25, 50, 100],
                         initComplete: function () {
                             
@@ -355,7 +328,7 @@
                             const subdomain = rowData.sub_domain;
 
                             $.ajax({
-                                url: `${API_URL}?subdomain=${subdomain}&markAsInactive=true&authtoken=${sessionemptoken}&empid=${empid}`,
+                                url: `${API_URL}?subdomain=${subdomain}&markAsActive=true&authtoken=${sessionemptoken}&empid=${empid}`,
                                 type: 'GET',
                                 success: function(response) {
                                     processedCount++;
@@ -378,64 +351,7 @@
                                     $('#responseMessage').html(`Completed with ${errors.length} errors:<br>${errors.join('<br>')}`);
                                 } else {
                                     // Show success message
-                                    $('#responseMessage').text('Moved app to invalid');
-                                }
-                                
-                                $('#responseModal').modal('show');
-                                
-                                // Reload table data after successful reset
-                                table.ajax.reload();
-                            }
-                        }
-                    });
-
-
-                    $('#resetBuildButton').on('click', function () {
-                        if (selectedSubdomains.size === 0) {
-                            alert("Please select at least one subdomain.");
-                            return;
-                        }
-
-                        $('#loader').removeClass("d-none");
-
-                        // Get selected rows data
-                        const selectedRows = table.rows().data().filter(function(rowData) {
-                            return selectedSubdomains.has(rowData.sub_domain);
-                        });
-
-                        let processedCount = 0;
-                        let errors = [];
-
-                        // Process each selected row
-                        selectedRows.each(function(rowData) {
-                            const buildRequired = rowData.build_required;
-                            const subdomain = rowData.sub_domain;
-
-                            $.ajax({
-                                url: `${API_URL}?build_number=${buildRequired}&subdomain=${subdomain}&is_from_script=true&update_entry=true`,
-                                type: 'GET',
-                                success: function(response) {
-                                    processedCount++;
-                                    checkCompletion();
-                                },
-                                error: function(xhr, status, error) {
-                                    processedCount++;
-                                    errors.push(`Failed to reset build for ${subdomain}: ${error}`);
-                                    checkCompletion();
-                                }
-                            });
-                        });
-
-                        function checkCompletion() {
-                            if (processedCount === selectedRows.length) {
-                                $('#loader').addClass("d-none");
-                                
-                                if (errors.length > 0) {
-                                    // Show errors if any
-                                    $('#responseMessage').html(`Completed with ${errors.length} errors:<br>${errors.join('<br>')}`);
-                                } else {
-                                    // Show success message
-                                    $('#responseMessage').text('Successfully reset build numbers for all selected operators');
+                                    $('#responseMessage').text('Moved app to Active');
                                 }
                                 
                                 $('#responseModal').modal('show');
@@ -465,44 +381,12 @@
                         excelButton.container().find('button').trigger('click');
                     });
 
-                    // Handle form submission
-                    $('#submitButton').on('click', function () {
-                        $('#loader').removeClass("d-none");
-
-                        if (selectedSubdomains.size === 0) {
-                            alert("Please select at least one subdomain.");
-                            $('#loader').addClass("d-none");
-                            return;
-                        }
-                        $.ajax({
-                        
-                            url: `${API_URL}?authtoken=${sessionemptoken}&subdomains=${Array.from(selectedSubdomains).join(',')}&empid=${empid}`,  // Update this to your API endpoint
-                            type: 'GET',
-                            success: function (response) {
-                                $('#responseMessage').text(response.build_required);
-                                $('#responseModal').modal('show');
-                                $('#loader').addClass("d-none");
-                            },
-                            error: function (xhr, status, error) {
-                                $('#responseMessage').text(`Error: ${error}`);
-                                $('#responseModal').modal('show');
-                                $('#loader').addClass("d-none");
-                            }
-                        });
-                        
-                    });
 
                     $('#responseModalClose').on('click', function() {
                         // Close the modal
                         $('#responseModal').modal('hide');
                         window.location.reload();
                         
-                    });
-
-                    $('#example').on('click', '.editBtn', function () {
-                        const encodedSubdomain = $(this).attr("data-subdomain");
-                        window.location.href = `updateoperator.html?subdomain=${encodedSubdomain}`;
-                        // alert(encodedSubdomain);
                     });
 
                     $('#customSearch').on('keyup', function() {
