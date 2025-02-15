@@ -64,7 +64,7 @@
                         <div class="input-group mr-2" style="width: 300px;">
                             <input type="text" id="customSearch" class="form-control" placeholder="Search any keywords...">
                         </div>
-                        <button id="movetoinvalid" class="btn btn-info d-flex align-items-center mr-2" style="height: 38px;">
+                        <button id="movetoinvalid" class="btn btn-info d-flex align-items-center mr-2" style="height: 38px;display: none !important;">
                             <i class="fas fa-rotate-left mr-1"></i>
                             Move to Active
                         </button>
@@ -173,11 +173,13 @@
                     } else if(sessionemprole == "admin") {
                         $("#submitButton").show();
                         $("#downloadExcel").show();
+                        $("#movetoinvalid").show();
                     } else if(sessionemprole == "maintainer") {
                         $("#submitButton").show();
                         $("#downloadExcel").show();
                         $("#menu_download_script").hide();
                         $("#menu_dashboard").hide();
+                        $("#movetoinvalid").show();
                     } else {
                         $("#menu_dashboard").hide();
                         $("#menu_download_script").hide();

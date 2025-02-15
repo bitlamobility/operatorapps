@@ -73,7 +73,7 @@
                             <i class="fas fa-rotate-left mr-1"></i>
                             Reset Build
                         </button>
-                        <button id="movetoinvalid" class="btn btn-info d-flex align-items-center mr-2" style="height: 38px;">
+                        <button id="movetoinvalid" class="btn btn-info d-flex align-items-center mr-2" style="height: 38px;display: none !important;">
                             <i class="fas fa-rotate-left mr-1"></i>
                             Move to Invalid
                         </button>
@@ -183,10 +183,12 @@
                         $("#movetoinvalid").hide();
                     } else if(sessionemprole == "admin") {
                         $("#resetBuildButton").show();
+                        $("#movetoinvalid").show();
                         $("#submitButton").show();
                         $("#downloadExcel").show();
                     } else if(sessionemprole == "maintainer") {
                         $("#resetBuildButton").show();
+                        $("#movetoinvalid").show();
                         $("#submitButton").show();
                         $("#downloadExcel").show();
                         $("#menu_download_script").hide();
