@@ -162,12 +162,14 @@
                         $("#menu_dashboard").hide();
                         $("#menu_download_script").hide();
                         $("#submitButton").show();
+                        $("#movetoinvalid").hide();
                     } else if(sessionemprole == "support") {
                         $("#menu_download_script").hide();
                         $("#menu_create_new_operator").hide();
                         $("#downloadExcel").show();
                         $("#menu_dashboard").hide();
                         $("#menu_pushfile").hide();
+                        $("#movetoinvalid").hide();
                     } else if(sessionemprole == "admin") {
                         $("#submitButton").show();
                         $("#downloadExcel").show();
@@ -179,6 +181,7 @@
                     } else {
                         $("#menu_dashboard").hide();
                         $("#menu_download_script").hide();
+                        $("#movetoinvalid").hide();
                     }
                 }
 
