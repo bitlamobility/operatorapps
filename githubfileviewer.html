@@ -7,25 +7,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            padding-top: 60px;
-            background-color: #f8f9fa;
-        }
-        .loader {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
         .file-icon {
             font-size: 24px;
             margin-right: 10px;
@@ -75,39 +58,67 @@
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">Operator Apps</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item" id="menu_home">
-                    <a class="nav-link" href="home.html">Home</a>
-                </li>
-                <li class="nav-item" id="menu_dashboard">
-                    <a class="nav-link" href="dashboard.html">Dashboard</a>
-                </li>
-                <li class="nav-item" id="menu_create_new_operator">
-                    <a class="nav-link" href="createoperator.html">Create New Operator</a>
-                </li>
-                <li class="nav-item" id="menu_download_script">
-                    <a class="nav-link" href="downloadScript.html">Download Script</a>
-                </li>
-                <!-- <li class="nav-item" id="menu_pushfile">
-                    <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
-                </li> -->
-                <li class="nav-item active" id="menu_fileviewer">
-                    <a class="nav-link" href="githubfileviewer.html">Subdomains Overview</a>
-                </li>
-                <li class="nav-item" id="menu_inactive">
-                    <a class="nav-link" href="inactive.html">Inactive Operators</a>
-                </li>
-                <li class="nav-item" id="menu_logout">
-                    <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
-                </li>
-            </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+        <div class="container-fluid">
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center" href="home.html">
+                <i class="fas fa-mobile-alt mr-2"></i>
+                Operator Apps
+            </a>
+    
+            <!-- Hamburger Menu -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <!-- Navigation Items -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" id="menu_home">
+                        <a class="nav-link" href="home.html">
+                            <i class="fas fa-home mr-1"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="menu_dashboard">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-chart-line mr-1"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="menu_create_new_operator">
+                        <a class="nav-link" href="createoperator.html">
+                            <i class="fas fa-plus-circle mr-1"></i>
+                            <span>Create Operator</span>
+                        </a>
+                    </li>
+                    <!-- <li class="nav-item" id="menu_download_script">
+                        <a class="nav-link" href="downloadScript.html">
+                            <i class="fas fa-download mr-1"></i>
+                            <span>Download</span>
+                        </a>
+                    </li> -->
+                    <li class="nav-item active" id="menu_fileviewer">
+                        <a class="nav-link" href="githubfileviewer.html">
+                            <i class="fas fa-folder-open mr-1"></i>
+                            <span>Subdomains</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="menu_inactive">
+                        <a class="nav-link" href="inactive.html">
+                            <i class="fas fa-pause-circle mr-1"></i>
+                            <span>Inactive</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="menu_logout">
+                        <a class="nav-link" href="javascript:void(0);" id="logout">
+                            <i class="fas fa-sign-out-alt mr-1"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
@@ -499,339 +510,361 @@
             });
         });
     </script> -->
-
-<script>
-    $(document).ready(function() {
-        if (typeof $.fn.DataTable === 'undefined') {
-            console.error('DataTables is not loaded');
-            return;
-        }
-    
-        let folderTable;
-    
-        // File type configurations
-        const fileTypes = {
-            'png': { icon: 'fa-image', color: '#28a745' },
-            'json': { icon: 'fa-file-code', color: '#ffc107' },
-            'jks': { icon: 'fa-key', color: '#dc3545' },
-            'keystore': { icon: 'fa-key', color: '#dc3545' },
-            'pem': { icon: 'fa-key', color: '#dc3545' },
-            'key': { icon: 'fa-key', color: '#dc3545' }
-        };
-    
-        // Initialize DataTable with proper configuration
-        folderTable = $('#folderTable').DataTable({
-            pageLength: 10,
-            lengthChange: true,
-            searching: true,
-            ordering: true,
-            info: true,
-            autoWidth: false,
-            responsive: true,
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            columns: [
-                { data: 'name' },
-                { data: 'updated' },
-                { 
-                    data: null,
-                    render: function(data, type, row) {
-                        return `
-                            <button class="btn btn-primary btn-sm view-files" data-folder="${row.name}">
-                                <i class="fas fa-folder-open"></i> View Files
-                            </button>`;
-                    }
-                }
-            ],
-            order: [[1, 'desc']]
-        });
-    
-        // Get GitHub token with proper async handling
-        async function getGithubToken() {
-            try {
-                const tokenResponse = await fetch('https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec?isFetchToken=true');
-                if (!tokenResponse.ok) {
-                    throw new Error('Token fetch failed');
-                }
-                const tokenData = await tokenResponse.json();
-                
-                if (tokenData.code !== 200 || !tokenData.data?.token) {
-                    throw new Error('Invalid token response');
-                }
-                
-                return tokenData.data.token;
-            } catch (error) {
-                console.error('Token fetch error:', error);
-                throw new Error('Failed to get GitHub access token');
-            }
-        }
-    
-        // Make GitHub API request with proper error handling
-        async function makeGitHubRequest(url, token) {
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
+    <script>
+        $(document).ready(function() {
+            // Add smooth scrolling when mobile menu is opened
+            $('.navbar-toggler').click(function() {
+                $('body').toggleClass('nav-open');
+            });
+        
+            // Close mobile menu when link is clicked
+            $('.nav-link').click(function() {
+                $('.navbar-collapse').collapse('hide');
+            });
+        
+            // Add active class to current page
+            const currentPage = window.location.pathname.split('/').pop();
+            $('.nav-link').each(function() {
+                if ($(this).attr('href') === currentPage) {
+                    $(this).parent().addClass('active').siblings().removeClass('active');
                 }
             });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`GitHub API Error: ${errorData.message}`);
-            }
-    
-            return response.json();
-        }
-    
-        // Country selection change handler
-        $('#countrySelect').change(function() {
-            const country = $(this).val();
-            if (country) {
-                loadFolders(country);
-            } else {
-                $('#folderListSection').addClass('d-none');
-            }
         });
+    </script>
     
-        // Load folders for selected country
-        async function loadFolders(country) {
-            $('#loader').removeClass('d-none');
-            
-            try {
-                const token = await getGithubToken();
-                const url = `https://api.github.com/repos/bitla-soft/operator-details/contents/${country}`;
-                const folders = await makeGitHubRequest(url, token);
-                
-                folderTable.clear();
-                
-                const directories = folders
-                    .filter(item => item.type === 'dir')
-                    .map(dir => ({
-                        name: dir.name,
-                        updated: new Date(dir.updated_at || Date.now()).toLocaleDateString()
-                    }));
-                
-                folderTable.rows.add(directories).draw();
-                $('#folderListSection').removeClass('d-none');
-                
-            } catch (error) {
-                console.error('Folder loading error:', error);
-                alert(`Error loading folders: ${error.message}`);
-            } finally {
-                $('#loader').addClass('d-none');
+    <script>
+        $(document).ready(function() {
+            if (typeof $.fn.DataTable === 'undefined') {
+                console.error('DataTables is not loaded');
+                return;
             }
-        }
-    
-        // View files button click handler
-        $('#folderTable').on('click', '.view-files', function() {
-            const folder = $(this).data('folder');
-            const country = $('#countrySelect').val();
-            showFiles(country, folder);
-        });
-    
-        // Show files in selected folder
-        async function showFiles(country, folder) {
-            $('#loader').removeClass('d-none');
-            
-            try {
-                const token = await getGithubToken();
-                const url = `https://api.github.com/repos/bitla-soft/operator-details/contents/${country}/${folder}`;
-                const files = await makeGitHubRequest(url, token);
-                
-                const fileList = $('#fileList');
-                fileList.empty();
-    
-                const validExtensions = Object.keys(fileTypes);
-                const filteredFiles = files
-                    .filter(file => 
-                        file.type === 'file' && 
-                        validExtensions.includes(file.name.split('.').pop().toLowerCase())
-                    )
-                    .sort((a, b) => a.name.localeCompare(b.name));
-                
-                if (filteredFiles.length === 0) {
-                    fileList.html(`
-                        <div class="col-12">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                No supported files found in this folder.
-                            </div>
-                        </div>
-                    `);
+        
+            let folderTable;
+        
+            // File type configurations
+            const fileTypes = {
+                'png': { icon: 'fa-image', color: '#28a745' },
+                'json': { icon: 'fa-file-code', color: '#ffc107' },
+                'jks': { icon: 'fa-key', color: '#dc3545' },
+                'keystore': { icon: 'fa-key', color: '#dc3545' },
+                'pem': { icon: 'fa-key', color: '#dc3545' },
+                'key': { icon: 'fa-key', color: '#dc3545' }
+            };
+        
+            // Initialize DataTable with proper configuration
+            folderTable = $('#folderTable').DataTable({
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                columns: [
+                    { data: 'name' },
+                    { data: 'updated' },
+                    { 
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <button class="btn btn-primary btn-sm view-files" data-folder="${row.name}">
+                                    <i class="fas fa-folder-open"></i> View Files
+                                </button>`;
+                        }
+                    }
+                ],
+                order: [[1, 'desc']]
+            });
+        
+            // Get GitHub token with proper async handling
+            async function getGithubToken() {
+                try {
+                    const tokenResponse = await fetch('https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec?isFetchToken=true');
+                    if (!tokenResponse.ok) {
+                        throw new Error('Token fetch failed');
+                    }
+                    const tokenData = await tokenResponse.json();
+                    
+                    if (tokenData.code !== 200 || !tokenData.data?.token) {
+                        throw new Error('Invalid token response');
+                    }
+                    
+                    return tokenData.data.token;
+                } catch (error) {
+                    console.error('Token fetch error:', error);
+                    throw new Error('Failed to get GitHub access token');
+                }
+            }
+        
+            // Make GitHub API request with proper error handling
+            async function makeGitHubRequest(url, token) {
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+        
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`GitHub API Error: ${errorData.message}`);
+                }
+        
+                return response.json();
+            }
+        
+            // Country selection change handler
+            $('#countrySelect').change(function() {
+                const country = $(this).val();
+                if (country) {
+                    loadFolders(country);
                 } else {
-                    filteredFiles.forEach(file => {
-                        const fileType = getFileTypeInfo(file.name);
-                        const size = formatFileSize(file.size);
-                        const lastUpdated = new Date(file.updated_at || Date.now()).toLocaleDateString();
-                        
-                        const card = `
-                            <div class="col-md-3 mb-4">
-                                <div class="card file-card">
-                                    <div class="card-body text-center">
-                                        <i class="fas ${fileType.icon} file-icon" style="color: ${fileType.color}"></i>
-                                        <h6 class="card-title text-truncate" title="${file.name}">${file.name}</h6>
-                                        <p class="card-text small text-muted mb-2">
-                                            Size: ${size}<br>
-                                            Updated: ${lastUpdated}
-                                        </p>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-primary preview-btn" 
-                                                    data-file="${file.name}" 
-                                                    data-country="${country}" 
-                                                    data-folder="${folder}"
-                                                    data-url="${file.download_url}">
-                                                <i class="fas fa-eye mr-1"></i> Preview
-                                            </button>
-                                            <a href="${file.download_url}" 
-                                               class="btn btn-sm btn-secondary"
-                                               download="${file.name}"
-                                               target="_blank">
-                                                <i class="fas fa-download"></i>
-                                            </a>
+                    $('#folderListSection').addClass('d-none');
+                }
+            });
+        
+            // Load folders for selected country
+            async function loadFolders(country) {
+                $('#loader').removeClass('d-none');
+                
+                try {
+                    const token = await getGithubToken();
+                    const url = `https://api.github.com/repos/bitla-soft/operator-details/contents/${country}`;
+                    const folders = await makeGitHubRequest(url, token);
+                    
+                    folderTable.clear();
+                    
+                    const directories = folders
+                        .filter(item => item.type === 'dir')
+                        .map(dir => ({
+                            name: dir.name,
+                            updated: new Date(dir.updated_at || Date.now()).toLocaleDateString()
+                        }));
+                    
+                    folderTable.rows.add(directories).draw();
+                    $('#folderListSection').removeClass('d-none');
+                    
+                } catch (error) {
+                    console.error('Folder loading error:', error);
+                    alert(`Error loading folders: ${error.message}`);
+                } finally {
+                    $('#loader').addClass('d-none');
+                }
+            }
+        
+            // View files button click handler
+            $('#folderTable').on('click', '.view-files', function() {
+                const folder = $(this).data('folder');
+                const country = $('#countrySelect').val();
+                showFiles(country, folder);
+            });
+        
+            // Show files in selected folder
+            async function showFiles(country, folder) {
+                $('#loader').removeClass('d-none');
+                
+                try {
+                    const token = await getGithubToken();
+                    const url = `https://api.github.com/repos/bitla-soft/operator-details/contents/${country}/${folder}`;
+                    const files = await makeGitHubRequest(url, token);
+                    
+                    const fileList = $('#fileList');
+                    fileList.empty();
+        
+                    const validExtensions = Object.keys(fileTypes);
+                    const filteredFiles = files
+                        .filter(file => 
+                            file.type === 'file' && 
+                            validExtensions.includes(file.name.split('.').pop().toLowerCase())
+                        )
+                        .sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    if (filteredFiles.length === 0) {
+                        fileList.html(`
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    No supported files found in this folder.
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        filteredFiles.forEach(file => {
+                            const fileType = getFileTypeInfo(file.name);
+                            const size = formatFileSize(file.size);
+                            const lastUpdated = new Date(file.updated_at || Date.now()).toLocaleDateString();
+                            
+                            const card = `
+                                <div class="col-md-3 mb-4">
+                                    <div class="card file-card">
+                                        <div class="card-body text-center">
+                                            <i class="fas ${fileType.icon} file-icon" style="color: ${fileType.color}"></i>
+                                            <h6 class="card-title text-truncate" title="${file.name}">${file.name}</h6>
+                                            <p class="card-text small text-muted mb-2">
+                                                Size: ${size}<br>
+                                                Updated: ${lastUpdated}
+                                            </p>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-primary preview-btn" 
+                                                        data-file="${file.name}" 
+                                                        data-country="${country}" 
+                                                        data-folder="${folder}"
+                                                        data-url="${file.download_url}">
+                                                    <i class="fas fa-eye mr-1"></i> Preview
+                                                </button>
+                                                <a href="${file.download_url}" 
+                                                class="btn btn-sm btn-secondary"
+                                                download="${file.name}"
+                                                target="_blank">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        `;
-                        fileList.append(card);
-                    });
+                            `;
+                            fileList.append(card);
+                        });
+                    }
+        
+                    $('#selectedFolderName').text(`Files in ${folder}`);
+                    $('#folderListSection').addClass('d-none');
+                    $('#filePreviewSection').removeClass('d-none');
+                    
+                } catch (error) {
+                    console.error('File loading error:', error);
+                    alert(`Error loading files: ${error.message}`);
+                } finally {
+                    $('#loader').addClass('d-none');
                 }
-    
-                $('#selectedFolderName').text(`Files in ${folder}`);
-                $('#folderListSection').addClass('d-none');
-                $('#filePreviewSection').removeClass('d-none');
-                
-            } catch (error) {
-                console.error('File loading error:', error);
-                alert(`Error loading files: ${error.message}`);
-            } finally {
-                $('#loader').addClass('d-none');
             }
-        }
-    
-        // Back to folders button handler
-        $('#backToFolders').click(function() {
-            $('#filePreviewSection').addClass('d-none');
-            $('#folderListSection').removeClass('d-none');
-        });
-    
-        // Get file type info
-        function getFileTypeInfo(filename) {
-            const extension = filename.split('.').pop().toLowerCase();
-            return fileTypes[extension] || { icon: 'fa-file', color: '#6c757d' };
-        }
-    
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-    
-        // File preview handler
-        $(document).on('click', '.preview-btn', async function() {
-            const file = $(this).data('file');
-            const country = $(this).data('country');
-            const folder = $(this).data('folder');
-            const downloadUrl = $(this).data('url');
-            const path = `${country}/${folder}/${file}`;
-            const fileType = getFileTypeInfo(file);
-    
-            const previewContent = $('#previewContent');
-            previewContent.empty();
-    
-            try {
-                if (file.endsWith('.png')) {
-                    previewContent.html(`
-                        <img src="${downloadUrl}" alt="${file}" class="file-preview">
-                        <p class="mt-3">Path: ${path}</p>
-                    `);
-                } else if (file.endsWith('.json')) {
-                    const response = await fetch(downloadUrl);
-                    const text = await response.text();
-                    try {
-                        // Try to parse and pretty print JSON
-                        const jsonData = JSON.parse(text);
-                        const prettyJson = JSON.stringify(jsonData, null, 2);
+        
+            // Back to folders button handler
+            $('#backToFolders').click(function() {
+                $('#filePreviewSection').addClass('d-none');
+                $('#folderListSection').removeClass('d-none');
+            });
+        
+            // Get file type info
+            function getFileTypeInfo(filename) {
+                const extension = filename.split('.').pop().toLowerCase();
+                return fileTypes[extension] || { icon: 'fa-file', color: '#6c757d' };
+            }
+        
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        
+            // File preview handler
+            $(document).on('click', '.preview-btn', async function() {
+                const file = $(this).data('file');
+                const country = $(this).data('country');
+                const folder = $(this).data('folder');
+                const downloadUrl = $(this).data('url');
+                const path = `${country}/${folder}/${file}`;
+                const fileType = getFileTypeInfo(file);
+        
+                const previewContent = $('#previewContent');
+                previewContent.empty();
+        
+                try {
+                    if (file.endsWith('.png')) {
                         previewContent.html(`
-                            <div class="text-left">
-                                <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
-                                <p>Path: ${path}</p>
-                                <pre class="bg-light p-3 mt-3" style="max-height: 400px; overflow-y: auto;"><code>${prettyJson}</code></pre>
-                            </div>
+                            <img src="${downloadUrl}" alt="${file}" class="file-preview">
+                            <p class="mt-3">Path: ${path}</p>
                         `);
-                    } catch (jsonError) {
-                        // If JSON parsing fails, show as plain text
+                    } else if (file.endsWith('.json')) {
+                        const response = await fetch(downloadUrl);
+                        const text = await response.text();
+                        try {
+                            // Try to parse and pretty print JSON
+                            const jsonData = JSON.parse(text);
+                            const prettyJson = JSON.stringify(jsonData, null, 2);
+                            previewContent.html(`
+                                <div class="text-left">
+                                    <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
+                                    <p>Path: ${path}</p>
+                                    <pre class="bg-light p-3 mt-3" style="max-height: 400px; overflow-y: auto;"><code>${prettyJson}</code></pre>
+                                </div>
+                            `);
+                        } catch (jsonError) {
+                            // If JSON parsing fails, show as plain text
+                            previewContent.html(`
+                                <div class="text-left">
+                                    <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
+                                    <p>Path: ${path}</p>
+                                    <pre class="bg-light p-3 mt-3" style="max-height: 400px; overflow-y: auto;"><code>${text}</code></pre>
+                                </div>
+                            `);
+                        }
+                    } else {
                         previewContent.html(`
                             <div class="text-left">
                                 <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
                                 <p>Path: ${path}</p>
-                                <pre class="bg-light p-3 mt-3" style="max-height: 400px; overflow-y: auto;"><code>${text}</code></pre>
+                                <p>Type: ${file.split('.').pop().toUpperCase()}</p>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-shield-alt mr-2"></i>
+                                    This is a security-sensitive file and cannot be previewed.
+                                </div>
+                                <a href="${downloadUrl}" class="btn btn-primary mt-2" download="${file}">
+                                    <i class="fas fa-download mr-2"></i>Download File
+                                </a>
                             </div>
                         `);
                     }
-                } else {
+                } catch (error) {
+                    console.error('Preview error:', error);
                     previewContent.html(`
-                        <div class="text-left">
-                            <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
-                            <p>Path: ${path}</p>
-                            <p>Type: ${file.split('.').pop().toUpperCase()}</p>
-                            <div class="alert alert-warning">
-                                <i class="fas fa-shield-alt mr-2"></i>
-                                This is a security-sensitive file and cannot be previewed.
-                            </div>
-                            <a href="${downloadUrl}" class="btn btn-primary mt-2" download="${file}">
-                                <i class="fas fa-download mr-2"></i>Download File
-                            </a>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Error loading file preview: ${error.message}
                         </div>
                     `);
                 }
-            } catch (error) {
-                console.error('Preview error:', error);
-                previewContent.html(`
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        Error loading file preview: ${error.message}
-                    </div>
-                `);
-            }
-    
-            $('#filePreviewModal').modal('show');
-        });
-    
-        // Clean up modal content when closed
-        $('#filePreviewModal').on('hidden.bs.modal', function () {
-            $('#previewContent').empty();
-        });
-    
-        // Session management with proper error handling
-        try {
-            const storedEmpId = sessionStorage.getItem("empid");
-            const sessionemptoken = sessionStorage.getItem("emptoken");
-            const sessionemprole = sessionStorage.getItem("emprole");
-    
-            if (!storedEmpId || !sessionemptoken) {
-                window.location.href = "index.html";
-                return;
-            }
-    
-            if(sessionemprole == "appdeveloper") {
-                $("#menu_dashboard, #menu_download_script").hide();
-            } else if(sessionemprole == "support") {
-                $("#menu_download_script, #menu_create_new_operator, #menu_pushfile").hide();
-            } else if(sessionemprole == "maintainer") {
-                $("#menu_download_script, #menu_dashboard").hide();
-            }
-        } catch (error) {
-            console.error('Session error:', error);
-            window.location.href = "index.html";
-        }
         
-        $("#logout").click(function(){
-            sessionStorage.clear();
-            window.location.href = "index.html";
+                $('#filePreviewModal').modal('show');
+            });
+        
+            // Clean up modal content when closed
+            $('#filePreviewModal').on('hidden.bs.modal', function () {
+                $('#previewContent').empty();
+            });
+        
+            // Session management with proper error handling
+            try {
+                const storedEmpId = sessionStorage.getItem("empid");
+                const sessionemptoken = sessionStorage.getItem("emptoken");
+                const sessionemprole = sessionStorage.getItem("emprole");
+        
+                if (!storedEmpId || !sessionemptoken) {
+                    window.location.href = "index.html";
+                    return;
+                }
+        
+                if(sessionemprole == "appdeveloper") {
+                    $("#menu_dashboard, #menu_download_script").hide();
+                } else if(sessionemprole == "support") {
+                    $("#menu_download_script, #menu_create_new_operator, #menu_pushfile").hide();
+                } else if(sessionemprole == "maintainer") {
+                    $("#menu_download_script, #menu_dashboard").hide();
+                }
+            } catch (error) {
+                console.error('Session error:', error);
+                window.location.href = "index.html";
+            }
+            
+            $("#logout").click(function(){
+                sessionStorage.clear();
+                window.location.href = "index.html";
+            });
         });
-    });</script>
+    </script>
 </body>
 </html>

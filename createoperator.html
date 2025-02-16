@@ -4,7 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
+        <link rel="stylesheet" href="style.css">
         <title>Operator Lists</title>
         <style>
             body {
@@ -64,6 +64,26 @@
                 height: 30px;
                 margin-right: 10px;
             }
+
+            .custom-file-label {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .custom-file-label::after {
+                content: "Browse";
+            }
+
+            .alert {
+                padding: 0.5rem 1rem;
+                margin-bottom: 0;
+            }
+
+            #keystore-name .alert,
+            #google-services-name .alert {
+                font-size: 0.875rem;
+            }
         </style>
     </head>
     <body>
@@ -73,185 +93,295 @@
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" >
-            <a class="navbar-brand" href="#">Bitla Software</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item" id="menu_home">
-                        <a class="nav-link" href="home.html">Home</a>
-                    </li>
-                    <li class="nav-item" id="menu_dashboard">
-                        <a class="nav-link" href="dashboard.html">Dashboard</a>
-                    </li>
-                    <li class="nav-item active" id="menu_create_new_operator">
-                        <a class="nav-link" href="createoperator.html">Create New Operator</a>
-                    </li>
-                    <li class="nav-item" id="menu_download_script">
-                        <a class="nav-link" href="downloadScript.html">Download Script File</a>
-                    </li>
-                    <!-- <li class="nav-item" id="menu_pushfile">
-                        <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
-                    </li> -->
-                    <li class="nav-item" id="menu_fileviewer">
-                        <a class="nav-link" href="githubfileviewer.html">Subdomains Overview</a>
-                    </li>
-                    <li class="nav-item" id="menu_inactive">
-                        <a class="nav-link" href="inactive.html">Inactive Operators</a>
-                    </li>
-                    <li class="nav-item" id="menu_logout">
-                        <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
-                    </li>
-                </ul>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+            <div class="container-fluid">
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center" href="home.html">
+                    <i class="fas fa-mobile-alt mr-2"></i>
+                    Operator Apps
+                </a>
+        
+                <!-- Hamburger Menu -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+        
+                <!-- Navigation Items -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item" id="menu_home">
+                            <a class="nav-link" href="home.html">
+                                <i class="fas fa-home mr-1"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_dashboard">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-chart-line mr-1"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item active" id="menu_create_new_operator">
+                            <a class="nav-link" href="createoperator.html">
+                                <i class="fas fa-plus-circle mr-1"></i>
+                                <span>Create Operator</span>
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item" id="menu_download_script">
+                            <a class="nav-link" href="downloadScript.html">
+                                <i class="fas fa-download mr-1"></i>
+                                <span>Download</span>
+                            </a>
+                        </li> -->
+                        <li class="nav-item" id="menu_fileviewer">
+                            <a class="nav-link" href="githubfileviewer.html">
+                                <i class="fas fa-folder-open mr-1"></i>
+                                <span>Subdomains</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_inactive">
+                            <a class="nav-link" href="inactive.html">
+                                <i class="fas fa-pause-circle mr-1"></i>
+                                <span>Inactive</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_logout">
+                            <a class="nav-link" href="javascript:void(0);" id="logout">
+                                <i class="fas fa-sign-out-alt mr-1"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
-        <div class="container">
-            <div class="jumbotron text-center mb-3 py-3">
-                <h2>Create a New entry of Operator for App Generation</h2>
+
+        <div class="container mt-4">
+            <div class="jumbotron text-center">
+                <h2><i class="fas fa-plus-circle mr-2"></i>Create a New entry of Operator for App Generation</h2>
             </div>
+    
             <div class="row">
-                <div class="col-md-6">
-                    <div class="card mb-5">
-                        <div class="card-header">
-                            <b>Create Entry in Excel Data</b>
+                <!-- Excel Data Entry Form -->
+                <div class="col-lg-12 mb-2">
+                    <div class="card">
+                        <div class="card-header" data-toggle="collapse" data-target="#createEntryCollapse" aria-expanded="true" style="cursor: pointer;">
+                            <i class="fas fa-table mr-2"></i>Create Entry in Excel Data
                         </div>
-                        <div class="card-body">
-                            <form id="CreateForm">
-                                <div class="form-row row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="operatorName" class="required-field">Operator Name</label>
-                                            <input type="text" class="form-control" id="operatorName" placeholder="Enter Operator Name" required>
+                        <div id="createEntryCollapse" class="collapse">
+                            <div class="card-body">
+                                <form id="CreateForm">
+                                    <!-- Basic Information -->
+                                    <div class="form-row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="operatorName" class="required-field">
+                                                    <i class="fas fa-building mr-1"></i>Operator Name
+                                                </label>
+                                                <input type="text" class="form-control" id="operatorName" 
+                                                       placeholder="Enter Operator Name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="travelCode" class="required-field" 
+                                                       data-toggle="tooltip" 
+                                                       title="Contact Production / Respective BA to know the travel code">
+                                                    <i class="fas fa-plane mr-1"></i>Travel Code
+                                                </label>
+                                                <input type="text" class="form-control" id="travelCode" 
+                                                       placeholder="Enter Travel Code" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="subDomain" class="required-field">
+                                                    <i class="fas fa-globe mr-1"></i>Sub Domain
+                                                </label>
+                                                <input type="text" class="form-control" id="subDomain" 
+                                                       placeholder="Enter Sub Domain" required>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="travelCode" class="required-field" data-toggle="tooltip" data-placement="right" title="Contact Production / Respective BA to know the travel code">Travel Code</label>
-                                            <input type="text" class="form-control" id="travelCode" placeholder="Enter Travel Code" required>
+        
+                                    <div class="form-row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="country" class="required-field">
+                                                    <i class="fas fa-flag mr-1"></i>Country
+                                                </label>
+                                                <select class="form-control" id="country">
+                                                    <option value="N">National (N)</option>
+                                                    <option value="A">Africa (A)</option>
+                                                    <option value="I">Indonesia (I)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="version_name" class="required-field">
+                                                    <i class="fas fa-code-branch mr-1"></i>Version
+                                                </label>
+                                                <input type="text" class="form-control" id="version_name" 
+                                                       placeholder="Enter Version Name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="version_code" class="required-field">
+                                                    <i class="fas fa-code mr-1"></i>Version Code
+                                                </label>
+                                                <input type="text" class="form-control" id="version_code" 
+                                                       placeholder="Enter Version Code" required>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="subDomain" class="required-field">Sub Domain</label>
-                                            <input type="text" class="form-control" id="subDomain" placeholder="Enter Sub Domain" required>
+        
+                                    <!-- Package Information -->
+                                    <div class="form-row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="packageName" class="required-field">
+                                                    <i class="fas fa-box mr-1"></i>Package Name
+                                                </label>
+                                                <input type="text" class="form-control" id="packageName" 
+                                                       placeholder="Enter Package Name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="developerName" class="required-field">
+                                                    <i class="fas fa-user-cog mr-1"></i>Developer Name
+                                                </label>
+                                                <input type="text" class="form-control" id="developerName" 
+                                                       placeholder="Enter Developer Name" required>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="country" class="required-field">Country</label>
-                                            <select class="form-control" id="country">
-                                                <option value="N">National (N) </option>
-                                                <option value="A">Africa (A) </option>
-                                                <option value="I">Indonesia (I) </option>
-                                            </select>
+        
+                                    <!-- URL and Region -->
+                                    <div class="form-row">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="baseUrl" class="required-field">
+                                                    <i class="fas fa-link mr-1"></i>Base URL
+                                                </label>
+                                                <input type="url" class="form-control" id="baseUrl" 
+                                                       placeholder="Enter Base URL" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="region" class="required-field">
+                                                    <i class="fas fa-map-marker-alt mr-1"></i>Region
+                                                </label>
+                                                <input type="text" class="form-control" id="region" 
+                                                       placeholder="Enter Region" required>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <label for="version_name" class="required-field">Version</label>
-                                        <input type="text" class="form-control" id="version_name" placeholder="Enter Version Name" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="version_code" class="required-field">Version Code</label>
-                                        <input type="text" class="form-control" id="version_code" placeholder="Enter Version Code" required>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="packageName" class="required-field">Package Name</label>
-                                            <input type="text" class="form-control" id="packageName" placeholder="Enter Package Name" required>
+        
+                                    <!-- Play Store Information -->
+                                    <div class="form-row">
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label for="playStoreLink" class="required-field">
+                                                    <i class="fab fa-google-play mr-1"></i>Play Store Link
+                                                </label>
+                                                <input type="url" class="form-control" id="playStoreLink" 
+                                                       placeholder="Enter Play Store Link" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="playstore_update_date" class="required-field">
+                                                    <i class="fas fa-calendar-alt mr-1"></i>Upload Date
+                                                </label>
+                                                <input type="date" class="form-control" id="playstore_update_date" required>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="developerName" class="required-field">Developer Name</label>
-                                            <input type="text" class="form-control" id="developerName" placeholder="Enter Developer Name" required>
+        
+                                    <!-- Keystore Details -->
+                                    <div class="section-header mb-2">
+                                        <i class="fas fa-key"></i>
+                                        <b>Keystore / .jks Details</b>
+                                    </div>
+        
+                                    <div class="form-row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="keyFile" class="required-field">Key File Name</label>
+                                                <input type="text" class="form-control" id="keyFile" 
+                                                       placeholder="Enter Key File Name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="aliasName" class="required-field">Alias Name</label>
+                                                <input type="text" class="form-control" id="aliasName" 
+                                                       placeholder="Enter Alias Name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="password" class="required-field">Key Password</label>
+                                                <input type="text" class="form-control" id="password" 
+                                                       placeholder="Enter Password" required>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="baseUrl" class="required-field">Base URL</label>
-                                            <input type="url" class="form-control" id="baseUrl" placeholder="Enter Base URL" required>
+        
+                                    <!-- Firebase Analytics -->
+                                    <div class="section-header mb-2">
+                                        <i class="fas fa-chart-line"></i>
+                                        <b>Firebase Analytics Details</b>
+                                    </div>
+        
+                                    <div class="form-row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="analyticsEmail" class="required-field">Analytics Email</label>
+                                                <input type="email" class="form-control" id="analyticsEmail" 
+                                                       placeholder="Enter Analytics Email" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="analyticsProperty" class="required-field">Analytics Property</label>
+                                                <input type="text" class="form-control" id="analyticsProperty" 
+                                                       placeholder="Enter Analytics Property Name" required>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="region" class="required-field">Region</label>
-                                            <input type="text" class="form-control" id="region" placeholder="Enter Region" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="playStoreLink" class="required-field">Google Play Store Link</label>
-                                            <input type="url" class="form-control" id="playStoreLink" placeholder="Enter Play Store Link" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="playstore_update_date" class="required-field">Store Upload Date</label>
-                                            <input type="date" class="form-control" id="playstore_update_date" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h6 class="mb-4"><b><u>.Keystore / .jks Details</u></b></h6>
-                                <div class="form-row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="keyFile" class="required-field">Key File Name</label>
-                                            <input type="text" class="form-control" id="keyFile" placeholder="Enter Key File Name" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="aliasName" class="required-field">Alias Name</label>
-                                        <input type="text" class="form-control" id="aliasName" placeholder="Enter Alias Name" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label for="password" class="required-field">Key Password</label>
-                                        <input type="text" class="form-control" id="password" placeholder="Enter Password" required>
-                                    </div>
-                                </div>
-                                <h6 class="mb-4"><b><u>Firebase Analytics / Push Notification Details</u></b></h6>
-                                <div class="form-row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="analyticsEmail" class="required-field">Analytics Email ID</label>
-                                            <input type="email" class="form-control" id="analyticsEmail" placeholder="Enter Analytics Email" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="analyticsProperty" class="required-field">Analytics Property Name</label>
-                                            <input type="text" class="form-control" id="analyticsProperty" placeholder="Enter Analytics Property Name" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-block">Create Entry</button>
-                            </form>
+        
+                                    <button type="submit" class="btn btn-primary btn-block mt-4">
+                                        <i class="fas fa-save mr-2"></i>Create Entry
+                                    </button>
+                                </form>
+                            </div>
                         </div>
+                        
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card mb-5">
-                        <div class="card shadow-sm">
-                            <div class="card-header">
-                                <b>Generate Pull request in GitHub</b>
-                            </div>
+                <!-- GitHub Pull Request Form -->
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header" data-toggle="collapse" data-target="#PullRequestCollapse" aria-expanded="true" style="cursor: pointer;">
+                            <i class="fab fa-github mr-2"></i>Generate Pull Request in GitHub
+                        </div>
+                        <div id="PullRequestCollapse" class="collapse">
                             <div class="card-body">
                                 <!-- Location Details -->
-                                <div class="row">
+                                <div class="form-row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="country" class="required-field">Country</label>
-                                            <select class="form-control" id="country" required>
+                                            <label for="pr-country" class="required-field">
+                                                <i class="fas fa-globe-americas mr-1"></i>Country
+                                            </label>
+                                            <select class="form-control" id="pr-country" required>
                                                 <option value="">Select Country</option>
                                                 <option value="national">National</option>
                                                 <option value="africa">Africa</option>
@@ -261,77 +391,108 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="subdomain" class="required-field">Operator Subdomain</label>
-                                            <input type="text" class="form-control" id="subdomain" placeholder="e.g., operator1" required>
+                                            <label for="subdomain" class="required-field">
+                                                <i class="fas fa-sitemap mr-1"></i>Operator Subdomain
+                                            </label>
+                                            <input type="text" class="form-control" id="subdomain" 
+                                                placeholder="e.g., cbus" required>
                                         </div>
                                     </div>
                                 </div>
-        
+    
                                 <!-- Pull Request Details -->
-                                <div class="row">
+                                <div class="form-row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="pr-title" class="required-field">Pull Request Title</label>
-                                            <input type="text" class="form-control" id="pr-title" value="Update app assets for MyApp" placeholder="e.g., Update app assets for MyApp" required>
+                                            <label for="pr-title" class="required-field">
+                                                <i class="fas fa-heading mr-1"></i>Pull Request Title
+                                            </label>
+                                            <input type="text" class="form-control" id="pr-title" 
+                                                value="Update app assets for MyApp" 
+                                                placeholder="e.g., Update app assets for MyApp" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="pr-description">Pull Request Description</label>
+                                            <label for="pr-description">
+                                                <i class="fas fa-align-left mr-1"></i>Pull Request Description
+                                            </label>
                                             <textarea class="form-control" id="pr-description" rows="3" placeholder="Describe your changes">Update app assets Description</textarea>
                                         </div>
                                     </div>
                                 </div>
-        
+    
                                 <!-- File Upload Section -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="file-upload-card">
-                                            <div class="form-group">
-                                                <i class="fas fa-image fa-2x mb-2 text-primary"></i>
-                                                <h5>Icon (PNG only)</h5>
-                                                <small class="text-muted">Required size: 512x512px</small>
-                                                <input type="file" class="form-control-file mt-2" id="icon" accept=".png" onchange="validateAndPreviewImage('icon', 512, 512)">
-                                                <img id="icon-preview" class="image-preview mx-auto">
-                                                <div id="icon-error" class="text-danger small mt-2"></div>
-                                            </div>
+                                <div class="section-header mb-2">
+                                    <i class="fas fa-upload"></i>
+                                    <b>Upload Required Files</b>
+                                </div>
+    
+                                <!-- Icon Upload -->
+                                <div class="file-upload-card">
+                                    <div class="form-group mb-0">
+                                        <i class="fas fa-image fa-2x mb-2"></i>
+                                        <h5>App Icon (PNG)</h5>
+                                        <small class="text-muted d-block mb-3">Required size: 512x512px</small>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="icon" 
+                                                accept=".png" onchange="validateAndPreviewImage('icon', 512, 512)">
+                                            <label class="custom-file-label" for="icon">Choose file...</label>
                                         </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="file-upload-card">
-                                            <div class="form-group">
-                                                <i class="fas fa-image fa-2x mb-2 text-primary"></i>
-                                                <h5>Splash Screen (PNG only)</h5>
-                                                <small class="text-muted">Required size: 1280x1920px</small>
-                                                <input type="file" class="form-control-file mt-2" id="splash" accept=".png" onchange="validateAndPreviewImage('splash', 1280, 1920)">
-                                                <img id="splash-preview" class="image-preview mx-auto">
-                                                <div id="splash-error" class="text-danger small mt-2"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="file-upload-card">
-                                            <div class="form-group">
-                                                <i class="fas fa-key fa-2x mb-2 text-primary"></i>
-                                                <h5>Keystore File</h5>
-                                                <small class="text-muted">JKS files only</small>
-                                                <input type="file" class="form-control-file mt-2" id="keystore" accept=".jks" onchange="showFileName('keystore')">
-                                                <div id="keystore-name" class="small text-muted mt-2"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="file-upload-card">
-                                            <div class="form-group">
-                                                <i class="fas fa-file-code fa-2x mb-2 text-primary"></i>
-                                                <h5>Google Services JSON</h5>
-                                                <small class="text-muted">JSON files only</small>
-                                                <input type="file" class="form-control-file mt-2" id="google-services" accept=".json" onchange="showFileName('google-services')">
-                                                <div id="google-services-name" class="small text-muted mt-2"></div>
-                                            </div>
-                                        </div>
+                                        <img id="icon-preview" class="image-preview mx-auto">
+                                        <div id="icon-error" class="text-danger small mt-2"></div>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-block" onclick="uploadFiles()">Create Pull Request</button>
+    
+                                <!-- Splash Screen Upload -->
+                                <div class="file-upload-card">
+                                    <div class="form-group mb-0">
+                                        <i class="fas fa-image fa-2x mb-2"></i>
+                                        <h5>Splash Screen (PNG)</h5>
+                                        <small class="text-muted d-block mb-3">Required size: 1280x1920px</small>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="splash" 
+                                                accept=".png" onchange="validateAndPreviewImage('splash', 1280, 1920)">
+                                            <label class="custom-file-label" for="splash">Choose file...</label>
+                                        </div>
+                                        <img id="splash-preview" class="image-preview mx-auto">
+                                        <div id="splash-error" class="text-danger small mt-2"></div>
+                                    </div>
+                                </div>
+    
+                                <!-- Keystore Upload -->
+                                <div class="file-upload-card">
+                                    <div class="form-group mb-0">
+                                        <i class="fas fa-key fa-2x mb-2"></i>
+                                        <h5>Keystore File</h5>
+                                        <small class="text-muted d-block mb-3">JKS files only</small>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="keystore" 
+                                                accept=".jks" onchange="showFileName('keystore')">
+                                            <label class="custom-file-label" for="keystore">Choose file...</label>
+                                        </div>
+                                        <div id="keystore-name" class="small mt-2"></div>
+                                    </div>
+                                </div>
 
+                                <!-- Google Services Upload -->
+                                <div class="file-upload-card">
+                                    <div class="form-group mb-0">
+                                        <i class="fab fa-google fa-2x mb-2"></i>
+                                        <h5>Google Services JSON</h5>
+                                        <small class="text-muted d-block mb-3">JSON files only</small>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="google-services" 
+                                                accept=".json" onchange="showFileName('google-services')">
+                                            <label class="custom-file-label" for="google-services">Choose file...</label>
+                                        </div>
+                                        <div id="google-services-name" class="small mt-2"></div>
+                                    </div>
+                                </div>
+    
+                                <!-- Submit Button -->
+                                <button type="button" class="btn btn-primary btn-block mt-4" onclick="uploadFiles()">
+                                    <i class="fab fa-github mr-2"></i>Create Pull Request
+                                </button>
+    
                                 <!-- Status Messages -->
                                 <div id="status" class="mt-4"></div>
                             </div>
@@ -339,453 +500,33 @@
                     </div>
                 </div>
             </div>
-           
         </div>
-
         
-
         <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="createoperator.js"></script>
-        <!-- <script>
-            $(document).ready(function() {
-                // const API_URL = "https://script.google.com/macros/s/AKfycbyN92CNP9xwCIBkFSonIuYQpGQMRATgpWtax3U1Qs2vWUiR7rPAagPNgpvCebsn2_gZ/exec";
-                const API_URL = "https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec";
-                storedEmpId = sessionStorage.getItem("empid");
-                sessionemptoken = sessionStorage.getItem("emptoken");
-                var oldSubdomain = "";
-                sessionemprole = sessionStorage.getItem("emprole");
-
-                if(sessionemprole=="appdeveloper"){
-                    $("#menu_dashboard").hide();
-                    $("#menu_download_script").hide();
-                } else if(sessionemprole=="support"){
-                    $("#menu_download_script").hide();
-                    $("#menu_create_new_operator").hide();
-                    $("#menu_pushfile").hide();
-                }else if(sessionemprole == "maintainer") {
-                    $("#menu_download_script").hide();
-                    $("#menu_dashboard").hide();
-                }
-
-                if (!storedEmpId || !sessionemptoken) {
-                    window.location.href = "index.html";
-                }
-                
-                $("#logout").click(function(){
-                    sessionStorage.clear();
-                    window.location.href = "index.html";
-                });
-
-            
-                $("#CreateForm").submit(function (event) {
-                    event.preventDefault(); // Prevent default form submission
-                    $('#loader').removeClass("d-none");
-                    $("#CreateForm button[type='submit']").prop('disabled', true);
-                    // Collect form data
-                    const formData = {
-                        operatorName: $("#operatorName").val(),       // Operator Name
-                        subDomain: $("#subDomain").val(),            // Sub Domain
-                        country: $("#country").val(),                // Country
-                        versionName: $("#version_name").val(),       // Version Name
-                        versionCode: $("#version_code").val(),       // Version Code
-                        packageName: $("#packageName").val(),        // Package Name
-                        developerName: $("#developerName").val(),    // Developer Name
-                        keyFile: $("#keyFile").val(),                // Key File Name
-                        aliasName: $("#aliasName").val(),            // Alias Name
-                        password: $("#password").val(),         // Key Password
-                        baseUrl: $("#baseUrl").val(),                // Base URL
-                        region: $("#region").val(),                  // Region
-                        playStoreLink: $("#playStoreLink").val(),    // Google Play Store Link
-                        playStoreUploadDate: $("#playstore_update_date").val(), // Play Store Upload Date
-                        analyticsEmail: $("#analyticsEmail").val(),  // Analytics Email ID
-                        analyticsProperty: $("#analyticsProperty").val(), // Analytics Property Name
-                        travelCode: $("#travelCode").val() // Analytics Property Name
-                    };
-                    const formDataString = JSON.stringify(formData);
-                    console.log(btoa(formDataString));
-                    const formDataBase64 = encodeURIComponent(btoa(formDataString));
-
-                    $.ajax({
-                        url: `${API_URL}?create_entry=true&authtoken=${sessionemptoken}&empid=${storedEmpId}&datahash=${formDataBase64}`,
-                        type: 'GET',
-                        success: function (response) {
-                            $("#UpdateForm button[type='submit']").prop('disabled', false);
-                            if(response.code == 200){
-                                console.log(response);
-                                //$('#loader').addClass("d-none");
-                                alert(response.message);
-                                window.location.reload();
-                            }else{
-                                console.log(response.message);
-                                alert(response.message);
-                                $('#loader').addClass("d-none");
-                            }
-                            
-                        },
-                        error: function (xhr, status, error) {
-                            $("#UpdateForm button[type='submit']").prop('disabled', false);
-                            alert(`Error: ${error}`);
-                            console.log(`Error: ${error}`);
-                            $('#loader').addClass("d-none");
-                        }
-                    });
-                });
-            });
-            
-        </script>
-
         <script>
             $(document).ready(function() {
-                $('[data-toggle="tooltip"]').tooltip();
-
-                storedEmpId = sessionStorage.getItem("empid");
-                sessionemptoken = sessionStorage.getItem("emptoken");
-                sessionemprole = sessionStorage.getItem("emprole");
-
-                if(sessionemprole=="appdeveloper"){
-                    $("#menu_dashboard").hide();
-                    $("#menu_download_script").hide();
-                } else if(sessionemprole=="support"){
-                    $("#menu_download_script").hide();
-                    $("#menu_create_new_operator").hide();
-                    $("#menu_pushfile").hide();
-                }else if(sessionemprole == "maintainer") {
-                    $("#menu_download_script").hide();
-                    $("#menu_dashboard").hide();
-                }
-
-                if (!storedEmpId || !sessionemptoken) {
-                    window.location.href = "index.html";
-                }
-                
-                $("#logout").click(function(){
-                    sessionStorage.clear();
-                    window.location.href = "index.html";
+                // Add smooth scrolling when mobile menu is opened
+                $('.navbar-toggler').click(function() {
+                    $('body').toggleClass('nav-open');
+                });
+            
+                // Close mobile menu when link is clicked
+                $('.nav-link').click(function() {
+                    $('.navbar-collapse').collapse('hide');
+                });
+            
+                // Add active class to current page
+                const currentPage = window.location.pathname.split('/').pop();
+                $('.nav-link').each(function() {
+                    if ($(this).attr('href') === currentPage) {
+                        $(this).parent().addClass('active').siblings().removeClass('active');
+                    }
                 });
             });
-            async function validateAndPreviewImage(inputId, requiredWidth, requiredHeight) {
-                const input = document.getElementById(inputId);
-                const preview = document.getElementById(`${inputId}-preview`);
-                const error = document.getElementById(`${inputId}-error`);
-                
-                if (input.files && input.files[0]) {
-                    const file = input.files[0];
-                    const img = new Image();
-                    
-                    img.onload = function() {
-                        if (img.width !== requiredWidth || img.height !== requiredHeight) {
-                            error.textContent = `Image dimensions must be ${requiredWidth}x${requiredHeight}px. Current: ${img.width}x${img.height}px`;
-                            error.style.display = 'block';
-                            preview.style.display = 'none';
-                            input.value = ''; // Clear the file input
-                        } else {
-                            error.style.display = 'none';
-                            preview.style.display = 'block';
-                            preview.src = img.src;
-                        }
-                    };
-                    
-                    img.src = URL.createObjectURL(file);
-                }
-            }
-
-            async function checkExistingPR(repo, token, country, subdomain) {
-                const response = await fetch(`https://api.github.com/repos/${repo}/pulls?state=open`, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to check existing PRs');
-                }
-
-                const prs = await response.json();
-                return prs.find(pr => {
-                    const branchPattern = new RegExp(`update-${country}-${subdomain}-\\d+`);
-                    return branchPattern.test(pr.head.ref);
-                });
-            }
-
-            async function uploadFiles() {
-                $("#loader").removeClass("d-none");
-                let token;
-                try {
-                    const tokenResponse = await fetch('https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec?isFetchToken=true');
-                    if (!tokenResponse.ok) {
-                        throw new Error('Failed to fetch token');
-                    }
-                    const tokenData = await tokenResponse.json();
-                    
-                    // Check response code and extract token from the nested structure
-                    if (tokenData.code !== 200 || !tokenData.data?.token) {
-                        throw new Error(tokenData.message || 'Invalid token response');
-                    }
-                    token = tokenData.data.token;
-                } catch (error) {
-                    document.getElementById('status').innerHTML = `<p class="error">Error fetching token: ${error.message}</p>`;
-                    $("#loader").addClass("d-none");
-                    return;
-                }
-                const repoUrl = "https://github.com/bitla-soft/operator-details";
-                const country = document.getElementById('country').value;
-                const subdomain = document.getElementById('subdomain').value;
-                const prTitle = document.getElementById('pr-title').value;
-                const prDescription = document.getElementById('pr-description').value;
-                const statusDiv = document.getElementById('status');
-
-                const repoMatch = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
-                if (!repoMatch) {
-                    statusDiv.innerHTML = '<p class="error">Invalid GitHub repository URL</p>';
-                    return;
-                }
-                const repo = `${repoMatch[1]}/${repoMatch[2].replace('.git', '')}`;
-
-                try {
-                    // Check for existing PR
-                    const existingPR = await checkExistingPR(repo, token, country, subdomain);
-                    let branchName;
-                    
-                    if (existingPR) {
-                        branchName = existingPR.head.ref;
-                    } else {
-                        // Create new branch
-                        const masterRef = await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/master`, {
-                            headers: {
-                                'Authorization': `token ${token}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            }
-                        });
-                        
-                        if (!masterRef.ok) throw new Error('Failed to get master branch reference');
-                        
-                        const masterData = await masterRef.json();
-                        
-                        branchName = `update-${country}-${subdomain}-${Date.now()}`;
-                        const createBranch = await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `token ${token}`,
-                                'Accept': 'application/vnd.github.v3+json',
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                ref: `refs/heads/${branchName}`,
-                                sha: masterData.object.sha
-                            })
-                        });
-
-                        if (!createBranch.ok) throw new Error('Failed to create new branch');
-                    }
-
-                    // Process each file
-                    const files = {
-                        'ic_launcher.png': document.getElementById('icon').files[0],
-                        'splash.png': document.getElementById('splash').files[0],
-                        'google-services.json': document.getElementById('google-services').files[0]
-                    };
-                    
-                    // Add keystore with original filename
-                    const keystoreFile = document.getElementById('keystore').files[0];
-                    if (keystoreFile) files[keystoreFile.name] = keystoreFile;
-
-                    // Filter out empty files
-                    const filesToUpload = Object.entries(files).filter(([_, file]) => file);
-
-                    for (const [filename, file] of filesToUpload) {
-                        const content = await readFileAsBase64(file);
-                        const path = `${country}/${subdomain}/${filename}`;
-                        
-                        // First, try to get existing file's SHA from both the branch and master
-                        let sha;
-                        try {
-                            // Check in the current branch first
-                            const branchCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branchName}`, {
-                                headers: {
-                                    'Authorization': `token ${token}`,
-                                    'Accept': 'application/vnd.github.v3+json'
-                                }
-                            });
-                            
-                            if (branchCheck.ok) {
-                                const branchData = await branchCheck.json();
-                                sha = branchData.sha;
-                            } else {
-                                // If not in branch, check master
-                                const masterCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-                                    headers: {
-                                        'Authorization': `token ${token}`,
-                                        'Accept': 'application/vnd.github.v3+json'
-                                    }
-                                });
-                                
-                                if (masterCheck.ok) {
-                                    const masterData = await masterCheck.json();
-                                    sha = masterData.sha;
-                                }
-                            }
-                        } catch (error) {
-                            console.error('Error checking file existence:', error);
-                        }
-
-                        // Upload file
-                        const uploadResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Authorization': `token ${token}`,
-                                'Accept': 'application/vnd.github.v3+json',
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                message: `Update ${filename} for ${subdomain}`,
-                                content: content,
-                                branch: branchName,
-                                ...(sha && { sha }) // Only include sha if it exists
-                            })
-                        });
-
-                        if (!uploadResponse.ok) {
-                            const errorData = await uploadResponse.json();
-                            throw new Error(`Error uploading ${filename}: ${errorData.message}`);
-                        }
-
-                        statusDiv.innerHTML += `<p class="success">Successfully uploaded ${filename}</p>`;
-                    }
-
-                    // Create or update PR
-                    const prBody = `${prDescription}`;
-                    
-                    if (existingPR) {
-                        // Update existing PR
-                        const updatePr = await fetch(`https://api.github.com/repos/${repo}/pulls/${existingPR.number}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Authorization': `token ${token}`,
-                                'Accept': 'application/vnd.github.v3+json',
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                title: prTitle,
-                                body: prBody,
-                                assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
-                            })
-                        });
-
-                        if (!updatePr.ok) throw new Error('Failed to update Pull Request');
-                        const prData = await updatePr.json();
-                        
-                        statusDiv.innerHTML += `
-                            <div class="pr-link">
-                                <p class="success">✅ Pull Request updated successfully!</p>
-                                <p>Review the changes here:</p>
-                                <a href="${prData.html_url}" target="_blank">${prData.html_url}</a>
-                            </div>
-                        `;
-                    } else {
-                        // Create new PR
-                        const createPr = await fetch(`https://api.github.com/repos/${repo}/pulls`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `token ${token}`,
-                                'Accept': 'application/vnd.github.v3+json',
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                title: prTitle,
-                                body: prBody,
-                                head: branchName,
-                                base: 'master',
-                                assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
-                            })
-                        });
-
-                        if (!createPr.ok) throw new Error('Failed to create Pull Request');
-                        const prData = await createPr.json();
-                        
-                        // Add assignees to the newly created PR
-                        const addAssignees = await fetch(`https://api.github.com/repos/${repo}/issues/${prData.number}/assignees`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `token ${token}`,
-                                'Accept': 'application/vnd.github.v3+json',
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
-                            })
-                        });
-
-                        if (!addAssignees.ok) {
-                            console.error('Failed to add assignees:', await addAssignees.json());
-                            // Continue execution even if assignee update fails
-                        }
-
-                        statusDiv.innerHTML += `
-                            <div class="pr-link">
-                                <p class="success">✅ Pull Request created successfully!</p>
-                                <p>Review the changes here:</p>
-                                <a href="${prData.html_url}" target="_blank">${prData.html_url}</a>
-                            </div>
-                        `;
-                    }
-
-                    resetForm();
-
-                } catch (error) {
-                    statusDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
-                }
-                $("#loader").addClass("d-none");
-            }
-
-            function resetForm() {
-                // Reset select fields
-                document.getElementById('country').value = '';
-                
-                // Reset text inputs
-                document.getElementById('subdomain').value = '';
-                document.getElementById('pr-title').value = 'Update app assets for MyApp';
-                document.getElementById('pr-description').value = 'Update app assets Description';
-                
-                // Reset file inputs
-                document.getElementById('icon').value = '';
-                document.getElementById('splash').value = '';
-                document.getElementById('keystore').value = '';
-                document.getElementById('google-services').value = '';
-                
-                // Clear image previews
-                document.getElementById('icon-preview').style.display = 'none';
-                document.getElementById('splash-preview').style.display = 'none';
-                
-                // Clear file names
-                document.getElementById('keystore-name').textContent = '';
-                document.getElementById('google-services-name').textContent = '';
-                
-                // Clear error messages
-                document.getElementById('icon-error').textContent = '';
-                document.getElementById('splash-error').textContent = '';
-                
-                // Clear status messages after a delay
-                setTimeout(() => {
-                    document.getElementById('status').innerHTML = '';
-                }, 20000); // Clear after 20 seconds
-            }
-            
-            function readFileAsBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const base64String = reader.result
-                            .replace(/^data:.+;base64,/, '');
-                        resolve(base64String);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-            }
-
-        </script> -->
+        </script>
+        <script src="createoperator.js"></script>
+        
     </body>
 </html>

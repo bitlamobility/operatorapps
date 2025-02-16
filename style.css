@@ -31,7 +31,7 @@ body {
 .dt-length label{
     margin-left: 10px;
 }
-.count-section, .table-wrapper, #submitButton, .chart-container, .countdata, .dt-search {
+.count-section, .table-wrapper, #submitButton, .chart-container, .dt-search {
     display: none;
 }
 .jumbotron {
@@ -90,4 +90,93 @@ body {
 .card-header .btn:hover {
     transform: translateY(-1px);
     transition: transform 0.2s;
+}
+
+
+
+/* Base Navbar Styles */
+.navbar {
+    padding: 0.5rem 1rem;
+    min-height: 60px;
+}
+
+.navbar-brand {
+    font-size: 1.25rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Navigation Items */
+.nav-item {
+    position: relative;
+}
+
+.nav-link {
+    padding: 0.8rem 0.6rem !important;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.nav-link i {
+    font-size: 1rem;
+    width: 18px;
+    text-align: center;
+}
+
+/* Medium Screen Optimization */
+@media (min-width: 1014px) and (max-width: 1373px) {
+    .nav-link {
+        padding: 0.8rem 0.5rem !important;
+        font-size: 0.9rem;
+    }
+    
+    .nav-link i {
+        width: 16px;
+        margin-right: 0.3rem !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
+
+    .nav-link {
+        padding: 0.75rem 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link span {
+        font-size: 1rem;
+    }
+}
+
+/* Active and Hover States */
+.nav-item.active .nav-link {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Transition Effects */
+.nav-link {
+    transition: all 0.2s ease;
+}
+
+.navbar-collapse {
+    transition: all 0.3s ease;
 }

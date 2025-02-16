@@ -3,43 +3,89 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+        <link rel="stylesheet" href="style.css">
         <title>Operator Lists</title>
         <style>
-            body {
-                padding-top: 55px;  /* Adjust this value depending on the height of your navbar */
-            }
-            #loader{
-                display: block;
-                position: fixed;
-                background: #00000054;
-                width: 100%;
-                height: 100%;
-                z-index: 1;
-                padding-top: 15%;
-            }
-            .table-wrapper {
-                overflow-x: auto;
-                max-width: 100%;
-            }
-            .table-wrapper table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .table-responsive {
-                margin-bottom: 15px;
-            }
-            .count-section {
-                margin-top: 20px;
-                margin-bottom: 30px;
-            }
-            .count-item {
-                margin-bottom: 10px;
-            }
-            .dt-length label{
-                margin-left: 10px;
+            /* Card Styles */
+            .card {
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                margin-bottom: 1rem;
             }
             
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+            }
+            
+            /* Card Headers */
+            .card-header {
+                padding: 0.75rem 1.25rem;
+                user-select: none;
+            }
+            
+            /* Transition Icon */
+            .transition-icon {
+                transition: transform 0.3s ease;
+            }
+            
+            .collapse:not(.show) + .card-body .transition-icon,
+            [aria-expanded="false"] .transition-icon {
+                transform: rotate(-90deg);
+            }
+            
+            /* Table Styles */
+            .table-responsive {
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            
+            .table th {
+                position: sticky;
+                top: 0;
+                background: #f8f9fa;
+                z-index: 1;
+            }
+            
+            .table-hover tbody tr:hover {
+                background-color: rgba(0,0,0,.075);
+            }
+            
+            /* Responsive Adjustments */
+            @media (max-width: 768px) {
+                .card-header {
+                    padding: 0.5rem 1rem;
+                }
+                
+                .table-sm td, 
+                .table-sm th {
+                    padding: 0.5rem;
+                }
+                
+                .display-4 {
+                    font-size: 2.5rem;
+                }
+            }
+            
+            /* Custom Scrollbar */
+            .table-responsive::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            
+            .table-responsive::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+            
+            .table-responsive::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 3px;
+            }
+            
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
         </style>
     </head>
     <body>
@@ -48,159 +94,263 @@
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" >
-            <a class="navbar-brand" href="#">Bitla Software</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item" id="menu_home">
-                        <a class="nav-link" href="home.html">Home</a>
-                    </li>
-                    <li class="nav-item active" id="menu_dashboard">
-                        <a class="nav-link" href="dashboard.html">Dashboard</a>
-                    </li>
-                    <li class="nav-item" id="menu_create_new_operator">
-                        <a class="nav-link" href="createoperator.html">Create New Operator</a>
-                    </li>
-                    <li class="nav-item" id="menu_download_script">
-                        <a class="nav-link" href="downloadScript.html">Download Script File</a>
-                    </li>
-                    <!-- <li class="nav-item" id="menu_pushfile">
-                        <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
-                    </li> -->
-                    <li class="nav-item" id="menu_fileviewer">
-                        <a class="nav-link" href="githubfileviewer.html">Subdomains Overview</a>
-                    </li>
-                    <li class="nav-item" id="menu_inactive">
-                        <a class="nav-link" href="inactive.html">Inactive Operators</a>
-                    </li>
-                    <li class="nav-item" id="menu_logout">
-                        <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
-                    </li>
-                </ul>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+            <div class="container-fluid">
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center" href="home.html">
+                    <i class="fas fa-mobile-alt mr-2"></i>
+                    Operator Apps
+                </a>
+        
+                <!-- Hamburger Menu -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+        
+                <!-- Navigation Items -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item" id="menu_home">
+                            <a class="nav-link" href="home.html">
+                                <i class="fas fa-home mr-1"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li class="nav-item active" id="menu_dashboard">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-chart-line mr-1"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item " id="menu_create_new_operator">
+                            <a class="nav-link" href="createoperator.html">
+                                <i class="fas fa-plus-circle mr-1"></i>
+                                <span>Create Operator</span>
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item" id="menu_download_script">
+                            <a class="nav-link" href="downloadScript.html">
+                                <i class="fas fa-download mr-1"></i>
+                                <span>Download</span>
+                            </a>
+                        </li> -->
+                        <li class="nav-item" id="menu_fileviewer">
+                            <a class="nav-link" href="githubfileviewer.html">
+                                <i class="fas fa-folder-open mr-1"></i>
+                                <span>Subdomains</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_inactive">
+                            <a class="nav-link" href="inactive.html">
+                                <i class="fas fa-pause-circle mr-1"></i>
+                                <span>Inactive</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_logout">
+                            <a class="nav-link" href="javascript:void(0);" id="logout">
+                                <i class="fas fa-sign-out-alt mr-1"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
         <div class="container">
-            <br/>
-            <div class="countdata">
+            <div class="countdata my-4">
                 <div class="row">
                     <!-- Total Count Card -->
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header" data-toggle="collapse" data-target="#totalCountCollapse" aria-expanded="true" style="cursor: pointer;">
-                                <strong>Total Count</strong>
+                    <div class="col-lg-12 mb-4">
+                        <div class="card border-primary h-100 shadow-sm">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" 
+                                 data-toggle="collapse" 
+                                 data-target="#totalCountCollapse" 
+                                 aria-expanded="true" 
+                                 style="cursor: pointer;">
+                                <strong>
+                                    <i class="fas fa-chart-pie mr-2"></i>
+                                    Total Count
+                                </strong>
+                                <i class="fas fa-chevron-down transition-icon"></i>
                             </div>
                             <div id="totalCountCollapse" class="collapse show">
-                                <div class="card-body">
-                                    <h5 class="card-title"><span id="totalCount">0</span></h5>
+                                <div class="card-body text-center">
+                                    <h2 class="display-4 text-primary mb-0" id="totalCount">0</h2>
+                                    <small class="text-muted">Total Records</small>
                                 </div>
                             </div>
                         </div>
                     </div>
+        
                     <!-- Build Required Counts Card -->
-                    <div class="col-md-12 mt-4" id="build_required_count">
-                        <div class="card">
-                            <div class="card-header" data-toggle="collapse" data-target="#buildRequiredCountsCollapse" aria-expanded="false" style="cursor: pointer;">
-                                <strong>Build Required Counts</strong>
+                    <div class="col-lg-6 col-md-12 mb-4" id="build_required_count">
+                        <div class="card border-success h-100 shadow-sm">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center" 
+                                 data-toggle="collapse" 
+                                 data-target="#buildRequiredCountsCollapse" 
+                                 aria-expanded="false" 
+                                 style="cursor: pointer;">
+                                <strong>
+                                    <i class="fas fa-tools mr-2"></i>
+                                    Build Required Counts
+                                </strong>
+                                <i class="fas fa-chevron-down transition-icon"></i>
                             </div>
                             <div id="buildRequiredCountsCollapse" class="collapse">
                                 <div class="card-body">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Build Number</th>
-                                                <th>Count</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="buildRequiredCounts">
-                                        </tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-sm">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>Build Number</th>
+                                                    <th class="text-right">Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="buildRequiredCounts"></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+        
                     <!-- Country Wise Counts Card -->
-                    <div class="col-md-12 mt-4" id="country_count">
-                        <div class="card">
-                            <div class="card-header" data-toggle="collapse" data-target="#countryWiseCountsCollapse" aria-expanded="false" style="cursor: pointer;">
-                                <strong>Country Wise Counts</strong>
+                    <div class="col-lg-6 col-md-12 mb-4" id="country_count">
+                        <div class="card border-info h-100 shadow-sm">
+                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center" 
+                                 data-toggle="collapse" 
+                                 data-target="#countryWiseCountsCollapse" 
+                                 aria-expanded="false" 
+                                 style="cursor: pointer;">
+                                <strong>
+                                    <i class="fas fa-globe mr-2"></i>
+                                    Country Wise Counts
+                                </strong>
+                                <i class="fas fa-chevron-down transition-icon"></i>
                             </div>
                             <div id="countryWiseCountsCollapse" class="collapse">
                                 <div class="card-body">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Country</th>
-                                                <th>Count</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="countryWiseCounts">
-                                        </tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-sm">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>Country</th>
+                                                    <th class="text-right">Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="countryWiseCounts"></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+        
                     <!-- Region Wise Counts -->
-                    <div class="col-md-12 mt-4">
-                        <div class="card">
-                            <div class="card-header" data-toggle="collapse" data-target="#regionWiseCountsCollapse" aria-expanded="false" style="cursor: pointer;">
-                                <strong>Region Wise Counts</strong>
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="card border-warning h-100 shadow-sm">
+                            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center" 
+                                 data-toggle="collapse" 
+                                 data-target="#regionWiseCountsCollapse" 
+                                 aria-expanded="false" 
+                                 style="cursor: pointer;">
+                                <strong>
+                                    <i class="fas fa-map-marker-alt mr-2"></i>
+                                    Region Wise Counts
+                                </strong>
+                                <i class="fas fa-chevron-down transition-icon"></i>
                             </div>
                             <div id="regionWiseCountsCollapse" class="collapse">
                                 <div class="card-body">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Region</th>
-                                                <th>Count</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="regionWiseCounts">
-                                        </tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-sm">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>Region</th>
+                                                    <th class="text-right">Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="regionWiseCounts"></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+        
                     <!-- Email and Property Wise Counts -->
-                    <div class="col-md-12 mt-4" id="email_property_count">
-                        <div class="card">
-                            <div class="card-header" data-toggle="collapse" data-target="#emailPropertyCountsCollapse" aria-expanded="false" style="cursor: pointer;">
-                                <strong>Email and Property Wise Counts</strong>
+                    <div class="col-lg-6 col-md-12 mb-4" id="email_property_count">
+                        <div class="card border-danger h-100 shadow-sm">
+                            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center" 
+                                 data-toggle="collapse" 
+                                 data-target="#emailPropertyCountsCollapse" 
+                                 aria-expanded="false" 
+                                 style="cursor: pointer;">
+                                <strong>
+                                    <i class="fas fa-envelope mr-2"></i>
+                                    Email and Property Wise Counts
+                                </strong>
+                                <i class="fas fa-chevron-down transition-icon"></i>
                             </div>
                             <div id="emailPropertyCountsCollapse" class="collapse">
                                 <div class="card-body">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Email</th>
-                                                <th>Property</th>
-                                                <th>Count</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="emailPropertyCounts">
-                                        </tbody>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-sm">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>Email</th>
+                                                    <th>Property</th>
+                                                    <th class="text-right">Count</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="emailPropertyCounts"></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>            
+            </div>
         </div>
-
 
         <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
         <script>
-            $(document).ready(function () {
+            $(document).ready(function() {
+                // Add collapse animation for chevron icons
+                $('.card-header').on('click', function() {
+                    $(this).find('.transition-icon').toggleClass('rotate-icon');
+                });
+            
+                // Smooth table row animation
+                $('.table tbody tr').hover(
+                    function() { $(this).addClass('transition'); },
+                    function() { $(this).removeClass('transition'); }
+                );
+
+                // Add smooth scrolling when mobile menu is opened
+                $('.navbar-toggler').click(function() {
+                    $('body').toggleClass('nav-open');
+                });
+            
+                // Close mobile menu when link is clicked
+                $('.nav-link').click(function() {
+                    $('.navbar-collapse').collapse('hide');
+                });
+            
+                // Add active class to current page
+                const currentPage = window.location.pathname.split('/').pop();
+                $('.nav-link').each(function() {
+                    if ($(this).attr('href') === currentPage) {
+                        $(this).parent().addClass('active').siblings().removeClass('active');
+                    }
+                });
+
                 // const API_URL = "https://script.google.com/macros/s/AKfycbyN92CNP9xwCIBkFSonIuYQpGQMRATgpWtax3U1Qs2vWUiR7rPAagPNgpvCebsn2_gZ/exec";
                 const API_URL = "https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec";
 

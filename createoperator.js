@@ -336,6 +336,27 @@ function readFileAsBase64(file) {
     });
 }
 
+function showFileName(inputId) {
+    const input = document.getElementById(inputId);
+    const nameDisplay = document.getElementById(`${inputId}-name`);
+    const customLabel = input.nextElementSibling; // Gets the custom-file-label
+
+    if (input.files && input.files[0]) {
+        const fileName = input.files[0].name;
+        // Update the custom file input label
+        customLabel.textContent = fileName;
+        // Show file name in the dedicated display area
+        nameDisplay.innerHTML = `
+            <div class="alert alert-success mt-2 mb-0">
+                <i class="fas fa-check-circle mr-2"></i>
+                Selected file: ${fileName}
+            </div>`;
+    } else {
+        // Reset to default state
+        customLabel.textContent = 'Choose file...';
+        nameDisplay.textContent = '';
+    }
+}
 
 $(document).ready(function() {
     
@@ -409,5 +430,10 @@ $(document).ready(function() {
                 $('#loader').addClass("d-none");
             }
         });
+    });
+
+    $('.custom-file-input').on('change', function() {
+        const fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').html(fileName || 'Choose file...');
     });
 });

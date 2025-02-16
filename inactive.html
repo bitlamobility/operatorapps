@@ -17,39 +17,67 @@
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" >
-            <a class="navbar-brand" href="#">Operator Apps</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item" id="menu_home">
-                        <a class="nav-link" href="home.html">Home</a>
-                    </li>
-                    <li class="nav-item" id="menu_dashboard">
-                        <a class="nav-link" href="dashboard.html">Dashboard</a>
-                    </li>
-                    <li class="nav-item" id="menu_create_new_operator">
-                        <a class="nav-link" href="createoperator.html">Create New Operator</a>
-                    </li>
-                    <li class="nav-item" id="menu_download_script">
-                        <a class="nav-link" href="downloadScript.html">Download Script File</a>
-                    </li>
-                    <!-- <li class="nav-item" id="menu_pushfile">
-                        <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
-                    </li> -->
-                    <li class="nav-item" id="menu_fileviewer">
-                        <a class="nav-link" href="githubfileviewer.html">Subdomains Overview</a>
-                    </li>
-                    <li class="nav-item active" id="menu_inactive">
-                        <a class="nav-link" href="inactive.html">Inactive Operators</a>
-                    </li>
-                    <li class="nav-item" id="menu_logout">
-                        <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
-                    </li>
-                </ul>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+            <div class="container-fluid">
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center" href="home.html">
+                    <i class="fas fa-mobile-alt mr-2"></i>
+                    Operator Apps
+                </a>
+        
+                <!-- Hamburger Menu -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+        
+                <!-- Navigation Items -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item" id="menu_home">
+                            <a class="nav-link" href="home.html">
+                                <i class="fas fa-home mr-1"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_dashboard">
+                            <a class="nav-link" href="dashboard.html">
+                                <i class="fas fa-chart-line mr-1"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_create_new_operator">
+                            <a class="nav-link" href="createoperator.html">
+                                <i class="fas fa-plus-circle mr-1"></i>
+                                <span>Create Operator</span>
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item" id="menu_download_script">
+                            <a class="nav-link" href="downloadScript.html">
+                                <i class="fas fa-download mr-1"></i>
+                                <span>Download</span>
+                            </a>
+                        </li> -->
+                        <li class="nav-item" id="menu_fileviewer">
+                            <a class="nav-link" href="githubfileviewer.html">
+                                <i class="fas fa-folder-open mr-1"></i>
+                                <span>Subdomains</span>
+                            </a>
+                        </li>
+                        <li class="nav-item active" id="menu_inactive">
+                            <a class="nav-link" href="inactive.html">
+                                <i class="fas fa-pause-circle mr-1"></i>
+                                <span>Inactive</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" id="menu_logout">
+                            <a class="nav-link" href="javascript:void(0);" id="logout">
+                                <i class="fas fa-sign-out-alt mr-1"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
@@ -147,6 +175,28 @@
 
         <!-- Print button JS (this is the critical file for the print button) -->
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+        
+        <script>
+            $(document).ready(function() {
+                // Add smooth scrolling when mobile menu is opened
+                $('.navbar-toggler').click(function() {
+                    $('body').toggleClass('nav-open');
+                });
+            
+                // Close mobile menu when link is clicked
+                $('.nav-link').click(function() {
+                    $('.navbar-collapse').collapse('hide');
+                });
+            
+                // Add active class to current page
+                const currentPage = window.location.pathname.split('/').pop();
+                $('.nav-link').each(function() {
+                    if ($(this).attr('href') === currentPage) {
+                        $(this).parent().addClass('active').siblings().removeClass('active');
+                    }
+                });
+            });
+        </script>
         
         <script>
             $(document).ready(function () {
