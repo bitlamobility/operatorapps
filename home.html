@@ -37,8 +37,11 @@
                     <li class="nav-item" id="menu_download_script">
                         <a class="nav-link" href="downloadScript.html">Download Script File</a>
                     </li>
-                    <li class="nav-item" id="menu_pushfile">
+                    <!-- <li class="nav-item" id="menu_pushfile">
                         <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
+                    </li> -->
+                    <li class="nav-item" id="menu_fileviewer">
+                        <a class="nav-link" href="githubfileviewer.html">Subdomains Overview</a>
                     </li>
                     <li class="nav-item" id="menu_inactive">
                         <a class="nav-link" href="inactive.html">Inactive Operators</a>
@@ -61,10 +64,17 @@
                     <span class="h5 mb-0">Bitla Software App Lists</span>
                     <!-- Input Box & Buttons -->
                     <div class="d-flex align-items-center">
+                        <!-- <div class="form-group">
+                            <label for="country" class="required-field">Account</label>
+                            <select class="form-control" id="country" required>
+                                <option value="">Select Account</option>
+                                <option value="national">Own Account</option>
+                                <option value="africa">Bitla Account</option>
+                            </select>
+                        </div> -->
                         <div class="input-group mr-2" style="width: 300px;">
                             <input type="text" id="customSearch" class="form-control" placeholder="Search any keywords...">
                         </div>
-                        
                         <button id="submitButton" class="btn btn-primary d-flex align-items-center mr-2" style="height: 38px;display: none !important;">
                             <i class="fas fa-cogs mr-1"></i>
                             Generate Build
@@ -181,6 +191,7 @@
                         $("#menu_dashboard").hide();
                         $("#menu_pushfile").hide();
                         $("#movetoinvalid").hide();
+                        $("#menu_fileviewer").hide();
                     } else if(sessionemprole == "admin") {
                         $("#resetBuildButton").show();
                         $("#movetoinvalid").show();
@@ -197,6 +208,7 @@
                         $("#movetoinvalid").hide();
                         $("#menu_dashboard").hide();
                         $("#menu_download_script").hide();
+                        $("#menu_fileviewer").hide();
                     }
                 }
 

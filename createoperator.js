@@ -1,0 +1,413 @@
+const API_URL = "https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec";
+
+function roleHandle(sessionemprole){
+    if(sessionemprole=="appdeveloper"){
+        $("#menu_dashboard").hide();
+        $("#menu_download_script").hide();
+    } else if(sessionemprole=="support"){
+        $("#menu_download_script").hide();
+        $("#menu_create_new_operator").hide();
+        $("#menu_pushfile").hide();
+        $("#menu_fileviewer").hide();
+    }else if(sessionemprole == "maintainer") {
+        $("#menu_download_script").hide();
+        $("#menu_dashboard").hide();
+    }
+}
+
+async function validateAndPreviewImage(inputId, requiredWidth, requiredHeight) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(`${inputId}-preview`);
+    const error = document.getElementById(`${inputId}-error`);
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const img = new Image();
+        
+        img.onload = function() {
+            if (img.width !== requiredWidth || img.height !== requiredHeight) {
+                error.textContent = `Image dimensions must be ${requiredWidth}x${requiredHeight}px. Current: ${img.width}x${img.height}px`;
+                error.style.display = 'block';
+                preview.style.display = 'none';
+                input.value = ''; // Clear the file input
+            } else {
+                error.style.display = 'none';
+                preview.style.display = 'block';
+                preview.src = img.src;
+            }
+        };
+        
+        img.src = URL.createObjectURL(file);
+    }
+}
+
+async function checkExistingPR(repo, token, country, subdomain) {
+    const response = await fetch(`https://api.github.com/repos/${repo}/pulls?state=open`, {
+        headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to check existing PRs');
+    }
+
+    const prs = await response.json();
+    return prs.find(pr => {
+        const branchPattern = new RegExp(`update-${country}-${subdomain}-\\d+`);
+        return branchPattern.test(pr.head.ref);
+    });
+}
+
+async function uploadFiles() {
+    $("#loader").removeClass("d-none");
+    let token;
+    try {
+        const tokenResponse = await fetch(`${API_URL}?isFetchToken=true`);
+        if (!tokenResponse.ok) {
+            throw new Error('Failed to fetch token');
+        }
+        const tokenData = await tokenResponse.json();
+        
+        // Check response code and extract token from the nested structure
+        if (tokenData.code !== 200 || !tokenData.data?.token) {
+            throw new Error(tokenData.message || 'Invalid token response');
+        }
+        token = tokenData.data.token;
+    } catch (error) {
+        document.getElementById('status').innerHTML = `<p class="error">Error fetching token: ${error.message}</p>`;
+        $("#loader").addClass("d-none");
+        return;
+    }
+    const repoUrl = "https://github.com/bitla-soft/operator-details";
+    const country = document.getElementById('country').value;
+    const subdomain = document.getElementById('subdomain').value;
+    const prTitle = document.getElementById('pr-title').value;
+    const prDescription = document.getElementById('pr-description').value;
+    const statusDiv = document.getElementById('status');
+
+    const repoMatch = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+    if (!repoMatch) {
+        statusDiv.innerHTML = '<p class="error">Invalid GitHub repository URL</p>';
+        return;
+    }
+    const repo = `${repoMatch[1]}/${repoMatch[2].replace('.git', '')}`;
+
+    try {
+        // Check for existing PR
+        const existingPR = await checkExistingPR(repo, token, country, subdomain);
+        let branchName;
+        
+        if (existingPR) {
+            branchName = existingPR.head.ref;
+        } else {
+            // Create new branch
+            const masterRef = await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/master`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!masterRef.ok) throw new Error('Failed to get master branch reference');
+            
+            const masterData = await masterRef.json();
+            
+            branchName = `update-${country}-${subdomain}-${Date.now()}`;
+            const createBranch = await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ref: `refs/heads/${branchName}`,
+                    sha: masterData.object.sha
+                })
+            });
+
+            if (!createBranch.ok) throw new Error('Failed to create new branch');
+        }
+
+        // Process each file
+        const files = {
+            'ic_launcher.png': document.getElementById('icon').files[0],
+            'splash.png': document.getElementById('splash').files[0],
+            'google-services.json': document.getElementById('google-services').files[0]
+        };
+        
+        // Add keystore with original filename
+        const keystoreFile = document.getElementById('keystore').files[0];
+        if (keystoreFile) files[keystoreFile.name] = keystoreFile;
+
+        // Filter out empty files
+        const filesToUpload = Object.entries(files).filter(([_, file]) => file);
+
+        for (const [filename, file] of filesToUpload) {
+            const content = await readFileAsBase64(file);
+            const path = `${country}/${subdomain}/${filename}`;
+            
+            // First, try to get existing file's SHA from both the branch and master
+            let sha;
+            try {
+                // Check in the current branch first
+                const branchCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branchName}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (branchCheck.ok) {
+                    const branchData = await branchCheck.json();
+                    sha = branchData.sha;
+                } else {
+                    // If not in branch, check master
+                    const masterCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (masterCheck.ok) {
+                        const masterData = await masterCheck.json();
+                        sha = masterData.sha;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking file existence:', error);
+            }
+
+            // Upload file
+            const uploadResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: `Update ${filename} for ${subdomain}`,
+                    content: content,
+                    branch: branchName,
+                    ...(sha && { sha }) // Only include sha if it exists
+                })
+            });
+
+            if (!uploadResponse.ok) {
+                const errorData = await uploadResponse.json();
+                throw new Error(`Error uploading ${filename}: ${errorData.message}`);
+            }
+
+            statusDiv.innerHTML += `<p class="success">Successfully uploaded ${filename}</p>`;
+        }
+
+        // Create or update PR
+        const prBody = `${prDescription}`;
+        
+        if (existingPR) {
+            // Update existing PR
+            const updatePr = await fetch(`https://api.github.com/repos/${repo}/pulls/${existingPR.number}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: prTitle,
+                    body: prBody,
+                    assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
+                })
+            });
+
+            if (!updatePr.ok) throw new Error('Failed to update Pull Request');
+            const prData = await updatePr.json();
+            
+            statusDiv.innerHTML += `
+                <div class="pr-link">
+                    <p class="success">✅ Pull Request updated successfully!</p>
+                    <p>Review the changes here:</p>
+                    <a href="${prData.html_url}" target="_blank">${prData.html_url}</a>
+                </div>
+            `;
+        } else {
+            // Create new PR
+            const createPr = await fetch(`https://api.github.com/repos/${repo}/pulls`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: prTitle,
+                    body: prBody,
+                    head: branchName,
+                    base: 'master',
+                    assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
+                })
+            });
+
+            if (!createPr.ok) throw new Error('Failed to create Pull Request');
+            const prData = await createPr.json();
+            
+            // Add assignees to the newly created PR
+            const addAssignees = await fetch(`https://api.github.com/repos/${repo}/issues/${prData.number}/assignees`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
+                })
+            });
+
+            if (!addAssignees.ok) {
+                console.error('Failed to add assignees:', await addAssignees.json());
+                // Continue execution even if assignee update fails
+            }
+
+            statusDiv.innerHTML += `
+                <div class="pr-link">
+                    <p class="success">✅ Pull Request created successfully!</p>
+                    <p>Review the changes here:</p>
+                    <a href="${prData.html_url}" target="_blank">${prData.html_url}</a>
+                </div>
+            `;
+        }
+
+        resetForm();
+
+    } catch (error) {
+        statusDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+    }
+    $("#loader").addClass("d-none");
+}
+
+function resetForm() {
+    // Reset select fields
+    document.getElementById('country').value = '';
+    
+    // Reset text inputs
+    document.getElementById('subdomain').value = '';
+    document.getElementById('pr-title').value = 'Update app assets for MyApp';
+    document.getElementById('pr-description').value = 'Update app assets Description';
+    
+    // Reset file inputs
+    document.getElementById('icon').value = '';
+    document.getElementById('splash').value = '';
+    document.getElementById('keystore').value = '';
+    document.getElementById('google-services').value = '';
+    
+    // Clear image previews
+    document.getElementById('icon-preview').style.display = 'none';
+    document.getElementById('splash-preview').style.display = 'none';
+    
+    // Clear file names
+    document.getElementById('keystore-name').textContent = '';
+    document.getElementById('google-services-name').textContent = '';
+    
+    // Clear error messages
+    document.getElementById('icon-error').textContent = '';
+    document.getElementById('splash-error').textContent = '';
+    
+    // Clear status messages after a delay
+    setTimeout(() => {
+        document.getElementById('status').innerHTML = '';
+    }, 20000); // Clear after 20 seconds
+}
+
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64String = reader.result
+                .replace(/^data:.+;base64,/, '');
+            resolve(base64String);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+
+$(document).ready(function() {
+    
+    $('[data-toggle="tooltip"]').tooltip();
+
+    storedEmpId = sessionStorage.getItem("empid");
+    sessionemptoken = sessionStorage.getItem("emptoken");
+    sessionemprole = sessionStorage.getItem("emprole");
+
+    roleHandle(sessionemprole);
+
+    if (!storedEmpId || !sessionemptoken) {
+        window.location.href = "index.html";
+    }
+    
+    $("#logout").click(function(){
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    });
+
+
+    $("#CreateForm").submit(function (event) {
+        event.preventDefault(); // Prevent default form submission
+        $('#loader').removeClass("d-none");
+        $("#CreateForm button[type='submit']").prop('disabled', true);
+        // Collect form data
+        const formData = {
+            operatorName: $("#operatorName").val(),       // Operator Name
+            subDomain: $("#subDomain").val(),            // Sub Domain
+            country: $("#country").val(),                // Country
+            versionName: $("#version_name").val(),       // Version Name
+            versionCode: $("#version_code").val(),       // Version Code
+            packageName: $("#packageName").val(),        // Package Name
+            developerName: $("#developerName").val(),    // Developer Name
+            keyFile: $("#keyFile").val(),                // Key File Name
+            aliasName: $("#aliasName").val(),            // Alias Name
+            password: $("#password").val(),         // Key Password
+            baseUrl: $("#baseUrl").val(),                // Base URL
+            region: $("#region").val(),                  // Region
+            playStoreLink: $("#playStoreLink").val(),    // Google Play Store Link
+            playStoreUploadDate: $("#playstore_update_date").val(), // Play Store Upload Date
+            analyticsEmail: $("#analyticsEmail").val(),  // Analytics Email ID
+            analyticsProperty: $("#analyticsProperty").val(), // Analytics Property Name
+            travelCode: $("#travelCode").val() // Analytics Property Name
+        };
+        const formDataString = JSON.stringify(formData);
+        console.log(btoa(formDataString));
+        const formDataBase64 = encodeURIComponent(btoa(formDataString));
+        
+        $.ajax({
+            url: `${API_URL}?create_entry=true&authtoken=${sessionemptoken}&empid=${storedEmpId}&datahash=${formDataBase64}`,
+            type: 'GET',
+            success: function (response) {
+                $("#UpdateForm button[type='submit']").prop('disabled', false);
+                if(response.code == 200){
+                    console.log(response);
+                    //$('#loader').addClass("d-none");
+                    alert(response.message);
+                    window.location.reload();
+                }else{
+                    console.log(response.message);
+                    alert(response.message);
+                    $('#loader').addClass("d-none");
+                }
+                
+            },
+            error: function (xhr, status, error) {
+                $("#UpdateForm button[type='submit']").prop('disabled', false);
+                alert(`Error: ${error}`);
+                console.log(`Error: ${error}`);
+                $('#loader').addClass("d-none");
+            }
+        });
+    });
+});

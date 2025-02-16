@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            padding-top: 60px;
+            background-color: #f8f9fa;
+        }
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .file-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .file-card {
+            transition: transform 0.2s;
+        }
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .search-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .file-preview {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+        }
+        .folder-list {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.25rem 0.5rem;
+            margin-left: 2px;
+        }
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1rem;
+        }
+        .dataTables_wrapper .dataTables_length {
+            margin-bottom: 1rem;
+        }
+    </style>
+    <title>Operator Lists</title>
+</head>
+<body>
+    <div id="loader" class="text-center d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="#">Operator Apps</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item" id="menu_home">
+                    <a class="nav-link" href="home.html">Home</a>
+                </li>
+                <li class="nav-item" id="menu_dashboard">
+                    <a class="nav-link" href="dashboard.html">Dashboard</a>
+                </li>
+                <li class="nav-item" id="menu_create_new_operator">
+                    <a class="nav-link" href="createoperator.html">Create New Operator</a>
+                </li>
+                <li class="nav-item" id="menu_download_script">
+                    <a class="nav-link" href="downloadScript.html">Download Script</a>
+                </li>
+                <!-- <li class="nav-item" id="menu_pushfile">
+                    <a class="nav-link" href="githubfileupload.html">Push File in Git</a>
+                </li> -->
+                <li class="nav-item active" id="menu_fileviewer">
+                    <a class="nav-link" href="githubfileviewer.html">Subdomains Overview</a>
+                </li>
+                <li class="nav-item" id="menu_inactive">
+                    <a class="nav-link" href="inactive.html">Inactive Operators</a>
+                </li>
+                <li class="nav-item" id="menu_logout">
+                    <a class="nav-link" id="logout" href="javascript:void(0);">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Country Selection -->
+        <div class="search-box">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="countrySelect">Select Country</label>
+                        <select class="form-control" id="countrySelect">
+                            <option value="">Select a country</option>
+                            <option value="national">National</option>
+                            <option value="indonesia">Indonesia</option>
+                            <option value="africa">Africa</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Folder List Section -->
+        <div class="folder-list d-none" id="folderListSection">
+            <table id="folderTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Subdomain Name</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Folders will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- File Preview Section -->
+        <div id="filePreviewSection" class="mt-4 d-none">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" id="selectedFolderName">Files in Folder</h5>
+                    <button class="btn btn-light btn-sm" id="backToFolders">
+                        <i class="fas fa-arrow-left"></i> Back to Folders
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="fileList">
+                        <!-- File cards will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Preview Modal -->
+    <div class="modal fade" id="filePreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">File Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="previewContent" class="text-center">
+                        <!-- Preview content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Required Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+
+    <!-- <script>
+        $(document).ready(function() {
+            if (typeof $.fn.DataTable === 'undefined') {
+                console.error('DataTables is not loaded');
+                return;
+            }
+
+            let folderTable;
+
+            // File type configurations for specific file types
+            const fileTypes = {
+                'png': { icon: 'fa-image', color: '#28a745' },
+                'json': { icon: 'fa-file-code', color: '#ffc107' },
+                'jks': { icon: 'fa-key', color: '#dc3545' },
+                'keystore': { icon: 'fa-key', color: '#dc3545' },
+                'pem': { icon: 'fa-key', color: '#dc3545' },
+                'key': { icon: 'fa-key', color: '#dc3545' }
+            };
+
+            // Initialize DataTable
+            folderTable = $('#folderTable').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                columns: [
+                    { data: 'name' },
+                    { data: 'updated' },
+                    { 
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <button class="btn btn-primary btn-sm view-files" data-folder="${row.name}">
+                                    <i class="fas fa-folder-open"></i> View Files
+                                </button>`;
+                        }
+                    }
+                ],
+                order: [[1, 'desc']]
+            });
+
+            // Country selection change handler
+            $('#countrySelect').change(function() {
+                const country = $(this).val();
+                if (country) {
+                    loadFolders(country);
+                } else {
+                    $('#folderListSection').addClass('d-none');
+                }
+            });
+
+            // View files button click handler
+            $('#folderTable').on('click', '.view-files', function() {
+                const folder = $(this).data('folder');
+                const country = $('#countrySelect').val();
+                showFiles(country, folder);
+            });
+
+            // Back to folders button handler
+            $('#backToFolders').click(function() {
+                $('#filePreviewSection').addClass('d-none');
+                $('#folderListSection').removeClass('d-none');
+            });
+
+            // Get file type info
+            function getFileTypeInfo(filename) {
+                const extension = filename.split('.').pop().toLowerCase();
+                return fileTypes[extension] || { icon: 'fa-file', color: '#6c757d' };
+            }
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Load folders for selected country
+            async function loadFolders(country) {
+                $('#loader').removeClass('d-none');
+                
+                try {
+                    
+                    const token = getGithubToken();
+                    
+                    const response = await fetch(`https://api.github.com/repos/bitla-soft/operator-details/contents/${country}`, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (!response.ok) throw new Error('Failed to fetch folders');
+                    
+                    const folders = await response.json();
+                    
+                    folderTable.clear();
+                    
+                    const directories = folders
+                        .filter(item => item.type === 'dir')
+                        .map(dir => ({
+                            name: dir.name,
+                            updated: new Date(dir.updated_at || Date.now()).toLocaleDateString()
+                        }));
+                    
+                    folderTable.rows.add(directories).draw();
+                    $('#folderListSection').removeClass('d-none');
+                    
+                } catch (error) {
+                    console.error('Error loading folders:', error);
+                    alert('Error loading folders. Please try again.');
+                } finally {
+                    $('#loader').addClass('d-none');
+                }
+            }
+
+            async function getGithubToken() {
+                const tokenResponse = await fetch('https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec?isFetchToken=true');
+                const tokenData = await tokenResponse.json();
+                
+                if (tokenData.code !== 200 || !tokenData.data?.token) {
+                    throw new Error('Failed to fetch token');
+                }
+                
+                return tokenData.data.token;
+            }
+
+            // Show files in selected folder
+            async function showFiles(country, folder) {
+                $('#loader').removeClass('d-none');
+                
+                try {
+                    
+                    const token = getGithubToken();
+                    
+                    const response = await fetch(`https://api.github.com/repos/bitla-soft/operator-details/contents/${country}/${folder}`, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+
+                    if (!response.ok) throw new Error('Failed to fetch files');
+                    
+                    const files = await response.json();
+                    const fileList = $('#fileList');
+                    fileList.empty();
+
+                    // Filter for supported file types and sort alphabetically
+                    const validExtensions = Object.keys(fileTypes);
+                    const filteredFiles = files
+                        .filter(file => 
+                            file.type === 'file' && 
+                            validExtensions.includes(file.name.split('.').pop().toLowerCase())
+                        )
+                        .sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    if (filteredFiles.length === 0) {
+                        fileList.html(`
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    No supported files found in this folder.
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        filteredFiles.forEach(file => {
+                            const fileType = getFileTypeInfo(file.name);
+                            const size = formatFileSize(file.size);
+                            const lastUpdated = new Date(file.updated_at || Date.now()).toLocaleDateString();
+                            
+                            const card = `
+                                <div class="col-md-3 mb-4">
+                                    <div class="card file-card">
+                                        <div class="card-body text-center">
+                                            <i class="fas ${fileType.icon} file-icon" style="color: ${fileType.color}"></i>
+                                            <h6 class="card-title text-truncate" title="${file.name}">${file.name}</h6>
+                                            <p class="card-text small text-muted mb-2">
+                                                Size: ${size}<br>
+                                                Updated: ${lastUpdated}
+                                            </p>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-primary preview-btn" 
+                                                        data-file="${file.name}" 
+                                                        data-country="${country}" 
+                                                        data-folder="${folder}"
+                                                        data-url="${file.download_url}">
+                                                    <i class="fas fa-eye mr-1"></i> Preview
+                                                </button>
+                                                <a href="${file.download_url}" 
+                                                   class="btn btn-sm btn-secondary"
+                                                   download="${file.name}"
+                                                   target="_blank">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            fileList.append(card);
+                        });
+                    }
+
+                    $('#selectedFolderName').text(`Files in ${folder}`);
+                    $('#folderListSection').addClass('d-none');
+                    $('#filePreviewSection').removeClass('d-none');
+                    
+                } catch (error) {
+                    console.error('Error showing files:', error);
+                    alert('Error loading files. Please try again.');
+                } finally {
+                    $('#loader').addClass('d-none');
+                }
+            }
+
+            // File preview handler
+            $(document).on('click', '.preview-btn', async function() {
+                const file = $(this).data('file');
+                const country = $(this).data('country');
+                const folder = $(this).data('folder');
+                const downloadUrl = $(this).data('url');
+                const path = `${country}/${folder}/${file}`;
+                const fileType = getFileTypeInfo(file);
+
+                const previewContent = $('#previewContent');
+                previewContent.empty();
+
+                try {
+                    if (file.endsWith('.png')) {
+                        // Image preview
+                        previewContent.html(`
+                            <img src="${downloadUrl}" alt="${file}" class="file-preview">
+                            <p class="mt-3">Path: ${path}</p>
+                        `);
+                    } else if (file.endsWith('.json')) {
+                        // JSON file preview
+                        const response = await fetch(downloadUrl);
+                        const text = await response.text();
+                        previewContent.html(`
+                            <div class="text-left">
+                                <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
+                                <p>Path: ${path}</p>
+                                <pre class="bg-light p-3 mt-3" style="max-height: 400px; overflow-y: auto;"><code>${text}</code></pre>
+                            </div>
+                        `);
+                    } else {
+                        // Security file info (jks, keystore, pem, key)
+                        previewContent.html(`
+                            <div class="text-left">
+                                <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
+                                <p>Path: ${path}</p>
+                                <p>Type: ${file.split('.').pop().toUpperCase()}</p>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-shield-alt mr-2"></i>
+                                    This is a security-sensitive file and cannot be previewed.
+                                </div>
+                                <a href="${downloadUrl}" class="btn btn-primary mt-2" download="${file}">
+                                    <i class="fas fa-download mr-2"></i>Download File
+                                </a>
+                            </div>
+                        `);
+                    }
+                } catch (error) {
+                    console.error('Error previewing file:', error);
+                    previewContent.html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Error loading file preview. Please try again.
+                        </div>
+                    `);
+                }
+
+                $('#filePreviewModal').modal('show');
+            });
+
+            // Session management
+            const storedEmpId = sessionStorage.getItem("empid");
+            const sessionemptoken = sessionStorage.getItem("emptoken");
+            const sessionemprole = sessionStorage.getItem("emprole");
+
+            if(sessionemprole == "appdeveloper") {
+                $("#menu_dashboard").hide();
+                $("#menu_download_script").hide();
+            } else if(sessionemprole == "support") {
+                $("#menu_download_script").hide();
+                $("#menu_create_new_operator").hide();
+                $("#menu_pushfile").hide();
+            } else if(sessionemprole == "maintainer") {
+                $("#menu_download_script").hide();
+                $("#menu_dashboard").hide();
+            }
+
+            if (!storedEmpId || !sessionemptoken) {
+                window.location.href = "index.html";
+            }
+            
+            $("#logout").click(function(){
+                sessionStorage.clear();
+                window.location.href = "index.html";
+            });
+        });
+    </script> -->
+
+<script>
+    $(document).ready(function() {
+        if (typeof $.fn.DataTable === 'undefined') {
+            console.error('DataTables is not loaded');
+            return;
+        }
+    
+        let folderTable;
+    
+        // File type configurations
+        const fileTypes = {
+            'png': { icon: 'fa-image', color: '#28a745' },
+            'json': { icon: 'fa-file-code', color: '#ffc107' },
+            'jks': { icon: 'fa-key', color: '#dc3545' },
+            'keystore': { icon: 'fa-key', color: '#dc3545' },
+            'pem': { icon: 'fa-key', color: '#dc3545' },
+            'key': { icon: 'fa-key', color: '#dc3545' }
+        };
+    
+        // Initialize DataTable with proper configuration
+        folderTable = $('#folderTable').DataTable({
+            pageLength: 10,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            responsive: true,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            columns: [
+                { data: 'name' },
+                { data: 'updated' },
+                { 
+                    data: null,
+                    render: function(data, type, row) {
+                        return `
+                            <button class="btn btn-primary btn-sm view-files" data-folder="${row.name}">
+                                <i class="fas fa-folder-open"></i> View Files
+                            </button>`;
+                    }
+                }
+            ],
+            order: [[1, 'desc']]
+        });
+    
+        // Get GitHub token with proper async handling
+        async function getGithubToken() {
+            try {
+                const tokenResponse = await fetch('https://script.google.com/macros/s/AKfycbxYfyiL-Ns_VK1t0K37dnt5ryTLM9a5fH4FlKdOnBo3rbCNpFu9iIifuRqVWXy_mIAhGQ/exec?isFetchToken=true');
+                if (!tokenResponse.ok) {
+                    throw new Error('Token fetch failed');
+                }
+                const tokenData = await tokenResponse.json();
+                
+                if (tokenData.code !== 200 || !tokenData.data?.token) {
+                    throw new Error('Invalid token response');
+                }
+                
+                return tokenData.data.token;
+            } catch (error) {
+                console.error('Token fetch error:', error);
+                throw new Error('Failed to get GitHub access token');
+            }
+        }
+    
+        // Make GitHub API request with proper error handling
+        async function makeGitHubRequest(url, token) {
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`GitHub API Error: ${errorData.message}`);
+            }
+    
+            return response.json();
+        }
+    
+        // Country selection change handler
+        $('#countrySelect').change(function() {
+            const country = $(this).val();
+            if (country) {
+                loadFolders(country);
+            } else {
+                $('#folderListSection').addClass('d-none');
+            }
+        });
+    
+        // Load folders for selected country
+        async function loadFolders(country) {
+            $('#loader').removeClass('d-none');
+            
+            try {
+                const token = await getGithubToken();
+                const url = `https://api.github.com/repos/bitla-soft/operator-details/contents/${country}`;
+                const folders = await makeGitHubRequest(url, token);
+                
+                folderTable.clear();
+                
+                const directories = folders
+                    .filter(item => item.type === 'dir')
+                    .map(dir => ({
+                        name: dir.name,
+                        updated: new Date(dir.updated_at || Date.now()).toLocaleDateString()
+                    }));
+                
+                folderTable.rows.add(directories).draw();
+                $('#folderListSection').removeClass('d-none');
+                
+            } catch (error) {
+                console.error('Folder loading error:', error);
+                alert(`Error loading folders: ${error.message}`);
+            } finally {
+                $('#loader').addClass('d-none');
+            }
+        }
+    
+        // View files button click handler
+        $('#folderTable').on('click', '.view-files', function() {
+            const folder = $(this).data('folder');
+            const country = $('#countrySelect').val();
+            showFiles(country, folder);
+        });
+    
+        // Show files in selected folder
+        async function showFiles(country, folder) {
+            $('#loader').removeClass('d-none');
+            
+            try {
+                const token = await getGithubToken();
+                const url = `https://api.github.com/repos/bitla-soft/operator-details/contents/${country}/${folder}`;
+                const files = await makeGitHubRequest(url, token);
+                
+                const fileList = $('#fileList');
+                fileList.empty();
+    
+                const validExtensions = Object.keys(fileTypes);
+                const filteredFiles = files
+                    .filter(file => 
+                        file.type === 'file' && 
+                        validExtensions.includes(file.name.split('.').pop().toLowerCase())
+                    )
+                    .sort((a, b) => a.name.localeCompare(b.name));
+                
+                if (filteredFiles.length === 0) {
+                    fileList.html(`
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                No supported files found in this folder.
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    filteredFiles.forEach(file => {
+                        const fileType = getFileTypeInfo(file.name);
+                        const size = formatFileSize(file.size);
+                        const lastUpdated = new Date(file.updated_at || Date.now()).toLocaleDateString();
+                        
+                        const card = `
+                            <div class="col-md-3 mb-4">
+                                <div class="card file-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas ${fileType.icon} file-icon" style="color: ${fileType.color}"></i>
+                                        <h6 class="card-title text-truncate" title="${file.name}">${file.name}</h6>
+                                        <p class="card-text small text-muted mb-2">
+                                            Size: ${size}<br>
+                                            Updated: ${lastUpdated}
+                                        </p>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-primary preview-btn" 
+                                                    data-file="${file.name}" 
+                                                    data-country="${country}" 
+                                                    data-folder="${folder}"
+                                                    data-url="${file.download_url}">
+                                                <i class="fas fa-eye mr-1"></i> Preview
+                                            </button>
+                                            <a href="${file.download_url}" 
+                                               class="btn btn-sm btn-secondary"
+                                               download="${file.name}"
+                                               target="_blank">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        fileList.append(card);
+                    });
+                }
+    
+                $('#selectedFolderName').text(`Files in ${folder}`);
+                $('#folderListSection').addClass('d-none');
+                $('#filePreviewSection').removeClass('d-none');
+                
+            } catch (error) {
+                console.error('File loading error:', error);
+                alert(`Error loading files: ${error.message}`);
+            } finally {
+                $('#loader').addClass('d-none');
+            }
+        }
+    
+        // Back to folders button handler
+        $('#backToFolders').click(function() {
+            $('#filePreviewSection').addClass('d-none');
+            $('#folderListSection').removeClass('d-none');
+        });
+    
+        // Get file type info
+        function getFileTypeInfo(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            return fileTypes[extension] || { icon: 'fa-file', color: '#6c757d' };
+        }
+    
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    
+        // File preview handler
+        $(document).on('click', '.preview-btn', async function() {
+            const file = $(this).data('file');
+            const country = $(this).data('country');
+            const folder = $(this).data('folder');
+            const downloadUrl = $(this).data('url');
+            const path = `${country}/${folder}/${file}`;
+            const fileType = getFileTypeInfo(file);
+    
+            const previewContent = $('#previewContent');
+            previewContent.empty();
+    
+            try {
+                if (file.endsWith('.png')) {
+                    previewContent.html(`
+                        <img src="${downloadUrl}" alt="${file}" class="file-preview">
+                        <p class="mt-3">Path: ${path}</p>
+                    `);
+                } else if (file.endsWith('.json')) {
+                    const response = await fetch(downloadUrl);
+                    const text = await response.text();
+                    try {
+                        // Try to parse and pretty print JSON
+                        const jsonData = JSON.parse(text);
+                        const prettyJson = JSON.stringify(jsonData, null, 2);
+                        previewContent.html(`
+                            <div class="text-left">
+                                <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
+                                <p>Path: ${path}</p>
+                                <pre class="bg-light p-3 mt-3" style="max-height: 400px; overflow-y: auto;"><code>${prettyJson}</code></pre>
+                            </div>
+                        `);
+                    } catch (jsonError) {
+                        // If JSON parsing fails, show as plain text
+                        previewContent.html(`
+                            <div class="text-left">
+                                <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
+                                <p>Path: ${path}</p>
+                                <pre class="bg-light p-3 mt-3" style="max-height: 400px; overflow-y: auto;"><code>${text}</code></pre>
+                            </div>
+                        `);
+                    }
+                } else {
+                    previewContent.html(`
+                        <div class="text-left">
+                            <h5><i class="fas ${fileType.icon}" style="color: ${fileType.color}"></i> ${file}</h5>
+                            <p>Path: ${path}</p>
+                            <p>Type: ${file.split('.').pop().toUpperCase()}</p>
+                            <div class="alert alert-warning">
+                                <i class="fas fa-shield-alt mr-2"></i>
+                                This is a security-sensitive file and cannot be previewed.
+                            </div>
+                            <a href="${downloadUrl}" class="btn btn-primary mt-2" download="${file}">
+                                <i class="fas fa-download mr-2"></i>Download File
+                            </a>
+                        </div>
+                    `);
+                }
+            } catch (error) {
+                console.error('Preview error:', error);
+                previewContent.html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Error loading file preview: ${error.message}
+                    </div>
+                `);
+            }
+    
+            $('#filePreviewModal').modal('show');
+        });
+    
+        // Clean up modal content when closed
+        $('#filePreviewModal').on('hidden.bs.modal', function () {
+            $('#previewContent').empty();
+        });
+    
+        // Session management with proper error handling
+        try {
+            const storedEmpId = sessionStorage.getItem("empid");
+            const sessionemptoken = sessionStorage.getItem("emptoken");
+            const sessionemprole = sessionStorage.getItem("emprole");
+    
+            if (!storedEmpId || !sessionemptoken) {
+                window.location.href = "index.html";
+                return;
+            }
+    
+            if(sessionemprole == "appdeveloper") {
+                $("#menu_dashboard, #menu_download_script").hide();
+            } else if(sessionemprole == "support") {
+                $("#menu_download_script, #menu_create_new_operator, #menu_pushfile").hide();
+            } else if(sessionemprole == "maintainer") {
+                $("#menu_download_script, #menu_dashboard").hide();
+            }
+        } catch (error) {
+            console.error('Session error:', error);
+            window.location.href = "index.html";
+        }
+        
+        $("#logout").click(function(){
+            sessionStorage.clear();
+            window.location.href = "index.html";
+        });
+    });</script>
+</body>
+</html>
