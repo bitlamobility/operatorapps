@@ -41,7 +41,7 @@ async function validateAndPreviewImage(inputId, requiredWidth, requiredHeight) {
     }
 }
 
-async function checkExistingPR(repo, token, country, subdomain) {
+async function old_checkExistingPR(repo, token, country, subdomain) {
     const response = await fetch(`https://api.github.com/repos/${repo}/pulls?state=open`, {
         headers: {
             'Authorization': `token ${token}`,
@@ -60,7 +60,26 @@ async function checkExistingPR(repo, token, country, subdomain) {
     });
 }
 
-async function uploadFiles() {
+async function checkExistingPR(repo, token, folderPath, subdomain) {
+    const response = await fetch(`https://api.github.com/repos/${repo}/pulls?state=open`, {
+        headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to check existing PRs');
+    }
+
+    const prs = await response.json();
+    return prs.find(pr => {
+        const branchPattern = new RegExp(`update-${folderPath}-${subdomain}-\\d+`);
+        return branchPattern.test(pr.head.ref);
+    });
+}
+
+async function oouploadFiles() {
     $("#loader").removeClass("d-none");
     let token;
     try {
@@ -271,6 +290,256 @@ async function uploadFiles() {
             if (!addAssignees.ok) {
                 console.error('Failed to add assignees:', await addAssignees.json());
                 // Continue execution even if assignee update fails
+            }
+
+            statusDiv.innerHTML += `
+                <div class="pr-link">
+                    <p class="success">✅ Pull Request created successfully!</p>
+                    <p>Review the changes here:</p>
+                    <a href="${prData.html_url}" target="_blank">${prData.html_url}</a>
+                </div>
+            `;
+        }
+
+        resetForm();
+
+    } catch (error) {
+        statusDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+    }
+    $("#loader").addClass("d-none");
+}
+
+async function uploadFiles() {
+    $("#loader").removeClass("d-none");
+    let token;
+    try {
+        const tokenResponse = await fetch(`${API_URL}?isFetchToken=true`);
+        if (!tokenResponse.ok) {
+            throw new Error('Failed to fetch token');
+        }
+        const tokenData = await tokenResponse.json();
+        
+        if (tokenData.code !== 200 || !tokenData.data?.token) {
+            throw new Error(tokenData.message || 'Invalid token response');
+        }
+        token = tokenData.data.token;
+    } catch (error) {
+        document.getElementById('status').innerHTML = `<p class="error">Error fetching token: ${error.message}</p>`;
+        $("#loader").addClass("d-none");
+        return;
+    }
+    
+    const repoUrl = "https://github.com/bitla-soft/operator-details";
+    
+    // Get the country from the PR form, not the Excel form
+    const countrySelect = document.getElementById('pr-country');
+    const country = countrySelect.value;
+    
+    // Convert country to folder path
+    let folderPath;
+    if (country === 'national') {
+        folderPath = 'national';
+    } else if (country === 'indonesia') {
+        folderPath = 'indonesia';
+    } else if (country === 'africa') {
+        folderPath = 'africa';
+    } else {
+        document.getElementById('status').innerHTML = '<p class="error">Please select a valid country</p>';
+        $("#loader").addClass("d-none");
+        return;
+    }
+    
+    const subdomain = document.getElementById('subdomain').value;
+    const prTitle = document.getElementById('pr-title').value;
+    const prDescription = document.getElementById('pr-description').value;
+    const statusDiv = document.getElementById('status');
+
+    const repoMatch = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+    if (!repoMatch) {
+        statusDiv.innerHTML = '<p class="error">Invalid GitHub repository URL</p>';
+        return;
+    }
+    const repo = `${repoMatch[1]}/${repoMatch[2].replace('.git', '')}`;
+
+    try {
+        // Check for existing PR - use correct folder path
+        const existingPR = await checkExistingPR(repo, token, folderPath, subdomain);
+        let branchName;
+        
+        if (existingPR) {
+            branchName = existingPR.head.ref;
+        } else {
+            // Create new branch with correct folder path
+            const masterRef = await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/master`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!masterRef.ok) throw new Error('Failed to get master branch reference');
+            
+            const masterData = await masterRef.json();
+            
+            // Use folder path in branch name
+            branchName = `update-${folderPath}-${subdomain}-${Date.now()}`;
+            const createBranch = await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ref: `refs/heads/${branchName}`,
+                    sha: masterData.object.sha
+                })
+            });
+
+            if (!createBranch.ok) throw new Error('Failed to create new branch');
+        }
+
+        // Process each file
+        const files = {
+            'ic_launcher.png': document.getElementById('icon').files[0],
+            'splash.png': document.getElementById('splash').files[0],
+            'google-services.json': document.getElementById('google-services').files[0]
+        };
+        
+        // Add keystore with original filename
+        const keystoreFile = document.getElementById('keystore').files[0];
+        if (keystoreFile) files[keystoreFile.name] = keystoreFile;
+
+        // Filter out empty files
+        const filesToUpload = Object.entries(files).filter(([_, file]) => file);
+
+        for (const [filename, file] of filesToUpload) {
+            // Use folder path for correct directory structure
+            const path = `${folderPath}/${subdomain}/${filename}`;
+            
+            const content = await readFileAsBase64(file);
+            
+            // First, try to get existing file's SHA
+            let sha;
+            try {
+                // Check in the current branch first
+                const branchCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branchName}`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (branchCheck.ok) {
+                    const branchData = await branchCheck.json();
+                    sha = branchData.sha;
+                } else {
+                    // If not in branch, check master
+                    const masterCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (masterCheck.ok) {
+                        const masterData = await masterCheck.json();
+                        sha = masterData.sha;
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking file existence:', error);
+            }
+
+            // Upload file with correct path
+            const uploadResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: `Update ${filename} for ${subdomain}`,
+                    content: content,
+                    branch: branchName,
+                    ...(sha && { sha })
+                })
+            });
+
+            if (!uploadResponse.ok) {
+                const errorData = await uploadResponse.json();
+                throw new Error(`Error uploading ${filename}: ${errorData.message}`);
+            }
+
+            statusDiv.innerHTML += `<p class="success">Successfully uploaded ${filename}</p>`;
+        }
+
+        // Rest of your PR creation code remains the same
+        const prBody = `${prDescription}`;
+        
+        if (existingPR) {
+            // Update existing PR
+            const updatePr = await fetch(`https://api.github.com/repos/${repo}/pulls/${existingPR.number}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: prTitle,
+                    body: prBody,
+                    assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
+                })
+            });
+
+            if (!updatePr.ok) throw new Error('Failed to update Pull Request');
+            const prData = await updatePr.json();
+            
+            statusDiv.innerHTML += `
+                <div class="pr-link">
+                    <p class="success">✅ Pull Request updated successfully!</p>
+                    <p>Review the changes here:</p>
+                    <a href="${prData.html_url}" target="_blank">${prData.html_url}</a>
+                </div>
+            `;
+        } else {
+            // Create new PR
+            const createPr = await fetch(`https://api.github.com/repos/${repo}/pulls`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: prTitle,
+                    body: prBody,
+                    head: branchName,
+                    base: 'master',
+                    assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
+                })
+            });
+
+            if (!createPr.ok) throw new Error('Failed to create Pull Request');
+            const prData = await createPr.json();
+            
+            // Add assignees to the newly created PR
+            const addAssignees = await fetch(`https://api.github.com/repos/${repo}/issues/${prData.number}/assignees`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    assignees: ['souvikcbitla', 'Surjeet-Singh-Rathore']
+                })
+            });
+
+            if (!addAssignees.ok) {
+                console.error('Failed to add assignees:', await addAssignees.json());
             }
 
             statusDiv.innerHTML += `
