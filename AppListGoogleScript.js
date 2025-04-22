@@ -489,7 +489,9 @@ function fetchAppLists(appListsSheet){
             region: row[14] ? row[14].toString().trim() : "-",
             analytics_email: row[15] ? row[15].toString().trim() : "-",
             analytics_property: row[16] ? row[16].toString().trim() : "-",
-            travel_code: row[17] ? row[17].toString().trim() : "-"
+            travel_code: row[17] ? row[17].toString().trim() : "-",
+            website_link: row[18] ? row[18].toString().trim() : "-",
+            video_splash: row[19] ? row[19].toString() : "N"
             };
         })
     };
@@ -537,7 +539,9 @@ function buildNumberGeneration(appListsSheet,subdomains){
                 region: row[14] ? row[14].toString().trim() : "-",
                 analytics_email: row[15] ? row[15].toString().trim() : "-",
                 analytics_property: row[16] ? row[16].toString().trim() : "-",
-                travel_code: row[17] ? row[17].toString().trim() : "-"
+                travel_code: row[17] ? row[17].toString().trim() : "-",
+                website_link: row[18] ? row[18].toString().trim() : "-",
+                video_splash: row[19] ? row[19].toString() : "N"
             };
         })
     };   
@@ -571,7 +575,9 @@ function fetchOnlySubdomain(appListsSheet,subdomain){
             region: row[14] ? row[14].toString().trim() : "-",
             analytics_email: row[15] ? row[15].toString().trim() : "-",
             analytics_property: row[16] ? row[16].toString().trim() : "-",
-            travel_code: row[17] ? row[17].toString().trim() : "-"
+            travel_code: row[17] ? row[17].toString().trim() : "-",
+            website_link: row[18] ? row[18].toString().trim() : "-",
+            video_splash: row[19] ? row[19].toString() : "N"
             };
         })
     };
