@@ -513,17 +513,17 @@
                                 <div class="file-upload-card">
                                     <div class="form-group mb-0">
                                         <i class="fab fa-google fa-2x mb-2"></i>
-                                        <h5>Splash Video</h5>
-                                        <small class="text-muted d-block mb-3">Required Format: 1080x1920px(<2MB)</small>
+                                        <h5>Splash Videos</h5>
+                                        <small class="text-muted d-block mb-3">Required Format: 1080x1920px (less than 2MB)</small>
                                         <div class="custom-file">
                                             <input type="file" class="custom-file-input" id="splash_video" 
-                                                accept=".mp4" onchange="validateSplashVideo(this)">
+                                                   accept="video/mp4" onchange="validateSplashVideo(this)">
                                             <label class="custom-file-label" for="splash_video">Choose file...</label>
                                         </div>
-                                        <div id="splash_video" class="small mt-2"></div>
+                                        <div id="splash_video_feedback" class="text-danger small mt-2"></div>
                                     </div>
                                 </div>
-    
+                                
                                 <!-- Submit Button -->
                                 <button type="button" class="btn btn-primary btn-block mt-4" onclick="uploadFiles()">
                                     <i class="fab fa-github mr-2"></i>Create Pull Request

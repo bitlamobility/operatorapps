@@ -47,12 +47,23 @@ async function validateSplashVideo(input) {
 
     // Reset feedback
     feedbackDiv.textContent = '';
+    feedbackDiv.classList.remove('text-success', 'text-danger');
 
     if (!file) return;
 
-    // Check file size
+    // Check file type
+    if (file.type !== "video/mp4") {
+        feedbackDiv.textContent = "Only MP4 format is allowed.";
+        feedbackDiv.classList.add('text-danger');
+        input.value = '';
+        return;
+    }
+
+    // Check file size (< 2MB)
     if (file.size > 2 * 1024 * 1024) {
-        feedbackDiv.textContent ="File size must be less than 2MB.";
+        feedbackDiv.textContent = "File size must be less than 2MB.";
+        feedbackDiv.classList.add('text-danger');
+        input.value = '';
         return;
     }
 
@@ -61,20 +72,27 @@ async function validateSplashVideo(input) {
     video.preload = "metadata";
 
     video.onloadedmetadata = function() {
-        window.URL.revokeObjectURL(video.src);
+        URL.revokeObjectURL(video.src);
+
         if (video.videoWidth === 1080 && video.videoHeight === 1920) {
-            feedbackDiv.textContent = "Video meets the requirements.";
+            feedbackDiv.textContent = "Video is valid.";
+            feedbackDiv.classList.add('text-success');
         } else {
             feedbackDiv.textContent = `Invalid dimensions: ${video.videoWidth}x${video.videoHeight}. Required: 1080x1920px.`;
+            feedbackDiv.classList.add('text-danger');
+            input.value = '';
         }
     };
 
     video.onerror = function() {
         feedbackDiv.textContent = "Invalid video file.";
+        feedbackDiv.classList.add('text-danger');
+        input.value = '';
     };
 
     video.src = URL.createObjectURL(file);
 }
+
 
 async function old_checkExistingPR(repo, token, country, subdomain) {
     const response = await fetch(`https://api.github.com/repos/${repo}/pulls?state=open`, {
