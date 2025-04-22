@@ -41,6 +41,41 @@ async function validateAndPreviewImage(inputId, requiredWidth, requiredHeight) {
     }
 }
 
+async function validateSplashVideo(input) {
+    const file = input.files[0];
+    const feedbackDiv = document.getElementById("splash_video_feedback");
+
+    // Reset feedback
+    feedbackDiv.textContent = '';
+
+    if (!file) return;
+
+    // Check file size
+    if (file.size > 2 * 1024 * 1024) {
+        feedbackDiv.textContent ="File size must be less than 2MB.";
+        return;
+    }
+
+    // Check video dimensions
+    const video = document.createElement("video");
+    video.preload = "metadata";
+
+    video.onloadedmetadata = function() {
+        window.URL.revokeObjectURL(video.src);
+        if (video.videoWidth === 1080 && video.videoHeight === 1920) {
+            feedbackDiv.textContent = "Video meets the requirements.";
+        } else {
+            feedbackDiv.textContent = `Invalid dimensions: ${video.videoWidth}x${video.videoHeight}. Required: 1080x1920px.`;
+        }
+    };
+
+    video.onerror = function() {
+        feedbackDiv.textContent = "Invalid video file.";
+    };
+
+    video.src = URL.createObjectURL(file);
+}
+
 async function old_checkExistingPR(repo, token, country, subdomain) {
     const response = await fetch(`https://api.github.com/repos/${repo}/pulls?state=open`, {
         headers: {
