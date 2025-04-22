@@ -669,7 +669,9 @@ $(document).ready(function() {
             playStoreUploadDate: $("#playstore_update_date").val(), // Play Store Upload Date
             analyticsEmail: $("#analyticsEmail").val(),  // Analytics Email ID
             analyticsProperty: $("#analyticsProperty").val(), // Analytics Property Name
-            travelCode: $("#travelCode").val() // Analytics Property Name
+            travelCode: $("#travelCode").val(), // Analytics Property Name
+            websiteLink: $("#websiteLink").val(), // Website Link
+            videoSplash: $("#videoSplash").val() // Analytics Property Name
         };
         const formDataString = JSON.stringify(formData);
         console.log(btoa(formDataString));
