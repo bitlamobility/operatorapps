@@ -456,7 +456,8 @@ async function uploadFiles() {
         const files = {
             'ic_launcher.png': document.getElementById('icon').files[0],
             'splash.png': document.getElementById('splash').files[0],
-            'google-services.json': document.getElementById('google-services').files[0]
+            'google-services.json': document.getElementById('google-services').files[0],
+            'splash_video.mp4': document.getElementById('splash_video').files[0]
         };
         
         // Add keystore with original filename
