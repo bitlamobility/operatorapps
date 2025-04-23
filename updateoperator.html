@@ -194,6 +194,24 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="form-row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="websiteLink">Website Link</label>
+                            <input type="url" class="form-control" id="websiteLink" placeholder="Enter Website Link" required>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="videoSplash">Video Splash</label>
+                            <select class="form-control" id="videoSplash">
+                                <option value="N">No (N) </option>
+                                <option value="Y">Yes (Y) </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -332,6 +350,8 @@
                     $("#analyticsProperty").val(appData.analytics_property);
                     $("#version_name").val(appData.version); // Populate Version Name
                     $("#version_code").val(appData.version_code); // Populate Version Code
+                    $("#websiteLink").val(appData.website_link);
+                    $("#videoSplash").val(appData.video_splash);
                     if (appData.last_app_published_date) {
                         try {
                             const date = new Date(appData.last_app_published_date);
@@ -370,7 +390,9 @@
                         version_name: $("#version_name").val(), // Collect Version Name
                         version_code: $("#version_code").val(), // Collect Version Code
                         playstore_upload_date: $("#playstore_update_date").val(), // Collect Play Store Upload Date
-                        travelCode: $("#travelCode").val() // Collect Play Store Upload Date
+                        travelCode: $("#travelCode").val(), // Collect Play Store Upload Date
+                        websiteLink: $("#websiteLink").val(),
+                        videoSplash: $("#videoSplash").val(),
                     };
                     const formDataString = JSON.stringify(formData);
                     //console.log(btoa(formDataString));

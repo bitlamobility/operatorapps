@@ -75,7 +75,7 @@ async function validateSplashVideo(input) {
         URL.revokeObjectURL(video.src);
 
         if (video.videoWidth === 1080 && video.videoHeight === 1920) {
-            feedbackDiv.textContent = "Video is valid.";
+            feedbackDiv.textContent = "";
             feedbackDiv.classList.add('text-success');
         } else {
             feedbackDiv.textContent = `Invalid dimensions: ${video.videoWidth}x${video.videoHeight}. Required: 1080x1920px.`;
