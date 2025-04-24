@@ -686,6 +686,7 @@ function resetForm() {
     
     // Reset text inputs
     document.getElementById('subdomain').value = '';
+    document.getElementById('newSubdomain').value = '';
     document.getElementById('pr-title').value = 'Update app assets for MyApp';
     document.getElementById('pr-description').value = 'Update app assets Description';
     
