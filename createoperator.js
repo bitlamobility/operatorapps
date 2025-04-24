@@ -371,7 +371,7 @@ async function uploadFiles() {
             throw new Error('Failed to fetch token');
         }
         const tokenData = await tokenResponse.json();
-        
+
         if (tokenData.code !== 200 || !tokenData.data?.token) {
             throw new Error(tokenData.message || 'Invalid token response');
         }
@@ -381,13 +381,13 @@ async function uploadFiles() {
         $("#loader").addClass("d-none");
         return;
     }
-    
+
     const repoUrl = "https://github.com/bitla-soft/operator-details";
-    
+
     // Get the country from the PR form, not the Excel form
     const countrySelect = document.getElementById('pr-country');
     const country = countrySelect.value;
-    
+
     // Convert country to folder path
     let folderPath;
     if (country === 'national') {
@@ -401,8 +401,17 @@ async function uploadFiles() {
         $("#loader").addClass("d-none");
         return;
     }
-    
-    const subdomain = document.getElementById('subdomain').value;
+
+    // Read form fields
+    let oldSubdomain = document.getElementById('subdomain').value.trim();
+    let subdomain = oldSubdomain;
+    const newSubdomainInput = document.getElementById('newSubdomain');
+    const newSubdomain = newSubdomainInput?.value?.trim();
+
+    if (newSubdomain && newSubdomain !== oldSubdomain) {
+        subdomain = newSubdomain;
+    }
+
     const prTitle = document.getElementById('pr-title').value;
     const prDescription = document.getElementById('pr-description').value;
     const statusDiv = document.getElementById('status');
@@ -416,9 +425,9 @@ async function uploadFiles() {
 
     try {
         // Check for existing PR - use correct folder path
-        const existingPR = await checkExistingPR(repo, token, folderPath, subdomain);
+        const existingPR = await checkExistingPR(repo, token, folderPath, oldSubdomain);
         let branchName;
-        
+
         if (existingPR) {
             branchName = existingPR.head.ref;
         } else {
@@ -429,11 +438,11 @@ async function uploadFiles() {
                     'Accept': 'application/vnd.github.v3+json'
                 }
             });
-            
+
             if (!masterRef.ok) throw new Error('Failed to get master branch reference');
-            
+
             const masterData = await masterRef.json();
-            
+
             // Use folder path in branch name
             branchName = `update-${folderPath}-${subdomain}-${Date.now()}`;
             const createBranch = await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
@@ -452,6 +461,68 @@ async function uploadFiles() {
             if (!createBranch.ok) throw new Error('Failed to create new branch');
         }
 
+        // If newSubdomain is provided and different, move folder contents
+        if (newSubdomain && newSubdomain !== oldSubdomain) {
+            const oldFolderPath = `${folderPath}/${oldSubdomain}`;
+            const newFolderPath = `${folderPath}/${newSubdomain}`;
+
+            const oldFilesResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${oldFolderPath}?ref=${branchName}`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (oldFilesResponse.ok) {
+                const oldFiles = await oldFilesResponse.json();
+
+                for (const file of oldFiles) {
+                    const filename = file.name;
+                    const fileContentResponse = await fetch(file.download_url);
+                    const blob = await fileContentResponse.blob();
+                    const reader = new FileReader();
+                    const base64 = await new Promise((resolve, reject) => {
+                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+
+                    const newPath = `${newFolderPath}/${filename}`;
+                    await fetch(`https://api.github.com/repos/${repo}/contents/${newPath}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Move ${filename} from ${oldSubdomain} to ${newSubdomain}`,
+                            content: base64,
+                            branch: branchName
+                        })
+                    });
+
+                    await fetch(`https://api.github.com/repos/${repo}/contents/${oldFolderPath}/${filename}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Delete old file ${filename} from ${oldSubdomain}`,
+                            sha: file.sha,
+                            branch: branchName
+                        })
+                    });
+
+                    statusDiv.innerHTML += `<p class="success">Renamed ${filename} to new subdomain folder</p>`;
+                }
+            } else {
+                statusDiv.innerHTML += `<p class="warning">Old subdomain folder not found. Skipping rename.</p>`;
+            }
+        }
+
         // Process each file
         const files = {
             'ic_launcher.png': document.getElementById('icon').files[0],
@@ -459,7 +530,7 @@ async function uploadFiles() {
             'google-services.json': document.getElementById('google-services').files[0],
             'splash_video.mp4': document.getElementById('splash_video').files[0]
         };
-        
+
         // Add keystore with original filename
         const keystoreFile = document.getElementById('keystore').files[0];
         if (keystoreFile) files[keystoreFile.name] = keystoreFile;
@@ -468,34 +539,30 @@ async function uploadFiles() {
         const filesToUpload = Object.entries(files).filter(([_, file]) => file);
 
         for (const [filename, file] of filesToUpload) {
-            // Use folder path for correct directory structure
             const path = `${folderPath}/${subdomain}/${filename}`;
-            
             const content = await readFileAsBase64(file);
-            
-            // First, try to get existing file's SHA
+
+            // Try to get existing file's SHA
             let sha;
             try {
-                // Check in the current branch first
                 const branchCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branchName}`, {
                     headers: {
                         'Authorization': `token ${token}`,
                         'Accept': 'application/vnd.github.v3+json'
                     }
                 });
-                
+
                 if (branchCheck.ok) {
                     const branchData = await branchCheck.json();
                     sha = branchData.sha;
                 } else {
-                    // If not in branch, check master
                     const masterCheck = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
                         headers: {
                             'Authorization': `token ${token}`,
                             'Accept': 'application/vnd.github.v3+json'
                         }
                     });
-                    
+
                     if (masterCheck.ok) {
                         const masterData = await masterCheck.json();
                         sha = masterData.sha;
@@ -505,7 +572,7 @@ async function uploadFiles() {
                 console.error('Error checking file existence:', error);
             }
 
-            // Upload file with correct path
+            // Upload file
             const uploadResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
                 method: 'PUT',
                 headers: {
@@ -529,11 +596,10 @@ async function uploadFiles() {
             statusDiv.innerHTML += `<p class="success">Successfully uploaded ${filename}</p>`;
         }
 
-        // Rest of your PR creation code remains the same
+        // Create or update PR
         const prBody = `${prDescription}`;
-        
+
         if (existingPR) {
-            // Update existing PR
             const updatePr = await fetch(`https://api.github.com/repos/${repo}/pulls/${existingPR.number}`, {
                 method: 'PATCH',
                 headers: {
@@ -550,7 +616,7 @@ async function uploadFiles() {
 
             if (!updatePr.ok) throw new Error('Failed to update Pull Request');
             const prData = await updatePr.json();
-            
+
             statusDiv.innerHTML += `
                 <div class="pr-link">
                     <p class="success">✅ Pull Request updated successfully!</p>
@@ -559,7 +625,6 @@ async function uploadFiles() {
                 </div>
             `;
         } else {
-            // Create new PR
             const createPr = await fetch(`https://api.github.com/repos/${repo}/pulls`, {
                 method: 'POST',
                 headers: {
@@ -578,8 +643,8 @@ async function uploadFiles() {
 
             if (!createPr.ok) throw new Error('Failed to create Pull Request');
             const prData = await createPr.json();
-            
-            // Add assignees to the newly created PR
+
+            // Add assignees after PR creation
             const addAssignees = await fetch(`https://api.github.com/repos/${repo}/issues/${prData.number}/assignees`, {
                 method: 'POST',
                 headers: {
@@ -612,6 +677,8 @@ async function uploadFiles() {
     }
     $("#loader").addClass("d-none");
 }
+
+
 
 function resetForm() {
     // Reset select fields

@@ -398,7 +398,7 @@
                             <div class="card-body">
                                 <!-- Location Details -->
                                 <div class="form-row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="pr-country" class="required-field">
                                                 <i class="fas fa-globe-americas mr-1"></i>Country
@@ -411,7 +411,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="subdomain" class="required-field">
                                                 <i class="fas fa-sitemap mr-1"></i>Operator Subdomain
@@ -420,6 +420,20 @@
                                                 placeholder="e.g., cbus" required>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="newSubdomain" class="required-field">
+                                                <i class="fas fa-sitemap mr-1"></i>
+                                                New Operator Subdomain
+                                                <small>(*Only provide if needed to change Subdomain)</small>
+                                            </label>
+                                            <input type="text" class="form-control" id="newSubdomain"
+                                                   placeholder="e.g., cbus"
+                                                   pattern="^[a-zA-Z0-9]*$"
+                                                   title="Only alphanumeric characters are allowed.">
+                                        </div>
+                                    </div>                                    
                                 </div>
     
                                 <!-- Pull Request Details -->
@@ -441,6 +455,7 @@
                                         </div>
                                     </div>
                                 </div>
+
     
                                 <!-- File Upload Section -->
                                 <div class="section-header mb-2">
