@@ -396,7 +396,10 @@ async function uploadFiles() {
         folderPath = 'indonesia';
     } else if (country === 'africa') {
         folderPath = 'africa';
-    } else {
+    } else if (country === 'cambodia') {
+        folderPath = 'cambodia';
+    }
+     else {
         document.getElementById('status').innerHTML = '<p class="error">Please select a valid country</p>';
         $("#loader").addClass("d-none");
         return;
